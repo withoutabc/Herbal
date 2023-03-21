@@ -18,11 +18,11 @@ func ReceiveSubmission(c *gin.Context) {
 		return
 	}
 	//保存提交结果
-	err = service.TransInsertSubmission(s)
+	err = service.Submit(s)
 	if err != nil {
+		log.Printf("submit err:%v\n", err)
 		util.RespInternalErr(c)
 		return
 	}
-	//返回用户填写的答案
-
+	util.RespOK(c, "submit success")
 }

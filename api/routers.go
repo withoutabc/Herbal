@@ -12,10 +12,10 @@ func InitRouter() {
 	{
 		u.POST("/register", Register)
 		u.POST("/login", Login)
-		u.POST("/refresh", Refresh, middleware.JWTAuthMiddleware())
+		u.POST("/refresh", middleware.JWTAuthMiddleware(), Refresh)
 	}
 
-	r.POST("/submit", ReceiveSubmission, middleware.JWTAuthMiddleware())
+	r.POST("/submit", middleware.JWTAuthMiddleware(), ReceiveSubmission)
 	r.GET("/questionnaire", GetQuestionnaire)
 	r.Run(":80")
 }
