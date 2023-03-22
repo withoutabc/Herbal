@@ -1,11 +1,15 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/xuri/excelize/v2"
 	"herbalBody/dao"
 	"herbalBody/model"
 	"log"
 	"math"
+	"os"
 )
 
 var map1 = map[int]string{
@@ -141,4 +145,157 @@ func Submit(s model.Submission) (err error) {
 	_ = tx.Commit()
 	log.Println("transaction success")
 	return nil
+}
+
+func GenExcel(userId int) (filename string, f *excelize.File, err error) {
+	var record, record2 int
+	var cell string
+	// 获取当前工作目录
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Printf("os.getwd err:%v\n", err)
+		return "", nil, err
+	}
+	// 创建一个新的 Excel 文件
+	f = excelize.NewFile()
+	// 创建一个名为 Sheet1 的表格
+	index, err := f.NewSheet("Sheet1")
+	if err != nil {
+		log.Printf("new sheet err:%v\n", err)
+		return "", nil, err
+	}
+	// 设置默认工作薄
+	f.SetActiveSheet(index)
+	// 修改工作薄名称
+	err = f.SetSheetName("Sheet1", "选项与得分")
+	if err != nil {
+		log.Printf("set sheet name err:%v\n", err)
+		return "", nil, err
+	}
+	// 写入
+	for questionnaireId := 1; ; questionnaireId++ {
+		questionnaire, err := dao.QueryQuestionnaire(questionnaireId)
+		if err != nil && err != sql.ErrNoRows {
+			log.Printf("query questionnaire err:%v\n", err)
+			return "", nil, err
+		}
+		if questionnaire != "" {
+			// 写入questionnaire
+			cell = fmt.Sprintf("A%d", 2*questionnaireId-1)
+			err = f.SetCellValue("选项与得分", cell, questionnaire)
+			if err != nil {
+				log.Printf("set cell value err:%v\n", err)
+				return "", nil, err
+			}
+			cell = fmt.Sprintf("A%d", 2*questionnaireId)
+			err = f.SetCellValue("选项与得分", cell, "选项")
+			if err != nil {
+				log.Printf("set cell value err:%v\n", err)
+				return "", nil, err
+			}
+			questions, err := dao.QueryQuestion(questionnaireId)
+			if err != nil && err != sql.ErrNoRows {
+				log.Printf("query question err:%v\n", err)
+				return "", nil, err
+			}
+			for k, question := range questions {
+				// 写问题
+				cell = fmt.Sprintf("%c%d", 'A'+k+1, 2*questionnaireId-1)
+				err = f.SetCellValue("选项与得分", cell, question.Question)
+				if err != nil {
+					log.Printf("set cell value err:%v\n", err)
+					return "", nil, err
+				}
+				// 写答案
+				cell = fmt.Sprintf("%c%d", 'A'+k+1, 2*questionnaireId)
+				// 先找一下答案
+				answer, err := dao.QuerySubmitAnswer(userId, questionnaireId, question.QuestionId)
+				if answer == "" {
+					log.Println("用户答案未提交完全")
+					return "", nil, errors.New("用户答案未提交完全")
+				}
+				if err != nil {
+					log.Printf("query submit answer err:%v\n", err)
+					return "", nil, err
+				}
+				// 写
+				err = f.SetCellValue("选项与得分", cell, answer)
+				if err != nil {
+					log.Printf("set cell value err:%v\n", err)
+					return "", nil, err
+				}
+				//记录一下，出循环后用
+				record = 'A' + k + 1
+				record2 = 2*questionnaireId - 1
+			}
+			cell = fmt.Sprintf("%c%d", record+1, record2)
+			err = f.SetCellValue("选项与得分", cell, "得分")
+			if err != nil {
+				log.Printf("set cell value err:%v\n", err)
+				return "", nil, err
+			}
+			cell = fmt.Sprintf("%c%d", record+1, record2+1)
+			//找一下得分
+			grade, err := dao.QueryGrade(userId, questionnaireId)
+			if err != nil {
+				log.Printf("query err:%v\n", err)
+				return "", nil, err
+			}
+			err = f.SetCellValue("选项与得分", cell, grade)
+			if err != nil {
+				log.Printf("set cell value err:%v\n", err)
+				return "", nil, err
+			}
+		} else {
+			break
+		}
+	}
+	//设置样式
+	centerStyle, err := f.NewStyle(&excelize.Style{
+		Alignment: &excelize.Alignment{
+			Horizontal: "center",
+			Vertical:   "center"}})
+	if err != nil {
+		log.Printf("center style err:%v\n", err)
+		return "", nil, err
+	}
+	err = f.SetCellStyle("选项与得分", "A1", cell, centerStyle)
+	if err != nil {
+		log.Printf("set cell style err:%v\n", err)
+		return "", nil, err
+	}
+	//row := []interface{}{"1", nil, 2}
+	//err = f.SetSheetRow("选项与得分", "A1", &row)
+	// 设置行高列宽（固定值）
+	endCol := fmt.Sprintf("%c", record+1)
+	err = f.SetColWidth("选项与得分", "A", "A", 10)
+	if err != nil {
+		log.Printf("set col1 err:%v\n", err)
+		return "", nil, err
+	}
+	err = f.SetColWidth("选项与得分", "B", endCol, 45)
+	if err != nil {
+		log.Printf("set col width err:%v\n", err)
+		return "", nil, err
+	}
+	for i := 1; i <= record2+1; i++ {
+		err := f.SetRowHeight("选项与得分", i, 20)
+		if err != nil {
+			log.Printf("set row height err:%v\n", err)
+			return "", nil, err
+		}
+	}
+	// 保存 Excel 文件
+	// 拼一下名字
+	err, username := dao.SearchUsernameByUserId(userId)
+	if err != nil {
+		log.Printf("search username err:%v\n", err)
+		return "", nil, err
+	}
+	filename = fmt.Sprintf("/%s-中医智慧诊疗诊断表.xlsx", username)
+	if err := f.SaveAs(wd + filename); err != nil {
+		log.Printf("save file err:%v\n", err)
+		return "", nil, err
+	}
+	return filename, f, nil
 }

@@ -7,6 +7,18 @@ import (
 	"strings"
 )
 
+var map1 = map[int]string{
+	1: "YangXu",
+	2: "YinXU",
+	3: "QiXu",
+	4: "TanShi",
+	5: "ShiRe",
+	6: "XueYu",
+	7: "TeBin",
+	8: "QiYu",
+	9: "PingHe",
+}
+
 func QueryIfExistQuestion(s model.Submission, questionId int) (err error, b bool) {
 	var answer string
 	err = DB.QueryRow("select answer_id from submission where user_id=? and step=? and question_id=?", s.UserId, s.Step, questionId).Scan(&answer)
@@ -46,4 +58,26 @@ func UpdateChangeGrade(userId int, term string, changeGrade int) (err error) {
 	sqL.WriteString("=? where user_id=?")
 	_, err = DB.Exec(sqL.String(), changeGrade, userId)
 	return err
+}
+
+func QuerySubmitAnswer(userId int, questionnaireId int, questionId int) (answer string, err error) {
+	var answerId int
+	err = DB.QueryRow("select answer_id from submission where user_id=? and step=? and question_id=?", userId, questionnaireId, questionId).Scan(&answerId)
+	if err != nil {
+		return "", err
+	}
+	err = DB.QueryRow("select `option` from `option` where questionnaire_id=? and question_id=? and option_id=?", questionnaireId, questionId, answerId).Scan(&answer)
+	if err != nil {
+		return "", err
+	}
+	return answer, nil
+}
+
+func QueryGrade(userId int, questionnaireId int) (grade int, err error) {
+	var sqL strings.Builder
+	sqL.WriteString("select ")
+	sqL.WriteString(map1[questionnaireId])
+	sqL.WriteString(" from grade where user_id=?")
+	err = DB.QueryRow(sqL.String(), userId).Scan(&grade)
+	return grade, err
 }

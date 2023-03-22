@@ -15,3 +15,8 @@ func InsertUser(u model.RegisterUser) (err error) {
 	_, err = DB.Exec("insert into user (username,password) values(?,?)", u.Username, u.Password)
 	return err
 }
+
+func SearchUsernameByUserId(userId int) (err error, username string) {
+	err = DB.QueryRow("select username from user where user_id=?", userId).Scan(&username)
+	return err, username
+}
