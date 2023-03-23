@@ -14,3 +14,8 @@ func InsertUser(u model.RegisterUser) (err error) {
 	err = dao.InsertUser(u)
 	return err
 }
+
+func SearchUsernameByUserId(userId int) (err error, username string) {
+	err, username = dao.SearchUsernameByUserId(userId)
+	return err, username
+}

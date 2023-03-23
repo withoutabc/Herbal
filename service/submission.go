@@ -32,7 +32,19 @@ var map2 = map[int]int{
 	5: 1,
 }
 
-// Submit 实现提交答案和算分功能
+var map3 = map[int]string{
+	1: "阳虚质",
+	2: "阴虚质",
+	3: "气虚质",
+	4: "痰湿质",
+	5: "湿热质",
+	6: "血瘀质",
+	7: "特禀质",
+	8: "气郁质",
+	9: "平和质",
+}
+
+// Submit 实现提交答案功能
 func Submit(s model.Submission) (err error) {
 	//插入分数
 	//判断是否存在那一行数据
@@ -41,7 +53,6 @@ func Submit(s model.Submission) (err error) {
 		log.Printf("query grade err:%v\n", err)
 		return err
 	}
-
 	if b == false {
 		err = dao.InsertGrade(s.UserId)
 		if err != nil {
@@ -147,22 +158,132 @@ func Submit(s model.Submission) (err error) {
 	return nil
 }
 
-func GenExcel(userId int) (filename string, f *excelize.File, err error) {
+// Comment 获取评价
+func Comment(userId int) (comment model.Comment, err error) {
+	//声明数组 储存成绩
+	var grades []int
+	var exist = false
+	//查找每个分数，确定结果
+	for i := 0; i < 9; i++ {
+		grade, err := dao.QueryGrade(userId, i+1)
+		if err != nil {
+			log.Printf("query grade err:%v\n", err)
+			return model.Comment{}, err
+		}
+		grades = append(grades, grade)
+	}
+	//判断分析
+	if grades[8] >= 60 {
+		//有大于40的情况
+		for i := 0; i < len(grades)-1; i++ {
+			if grades[i] >= 40 {
+				comment.Result = append(comment.Result, map3[i+1])
+				suggestion, err := dao.QuerySuggestion(i + 1)
+				if err != nil {
+					log.Printf("query suggestion err:%v\n", err)
+					return model.Comment{}, err
+				}
+				comment.Suggestion = append(comment.Suggestion, suggestion)
+				exist = true
+			}
+		}
+		if exist {
+			comment.Result = append(comment.Result, "是")
+			return comment, err
+		}
+		//没有大于40的情况，下面判断是否有30到39的
+		//主的肯定是平和质
+		comment.Result = append(comment.Result, map3[9])
+		suggestion, err := dao.QuerySuggestion(9)
+		if err != nil {
+			log.Printf("query suggestion err:%v\n", err)
+			return model.Comment{}, err
+		}
+		comment.Suggestion = append(comment.Suggestion, suggestion)
+		for i := 0; i < len(grades)-1; i++ {
+			if grades[i] < 40 && grades[i] >= 30 {
+				comment.Result = append(comment.Result, map3[i+1])
+				suggestion, err = dao.QuerySuggestion(i + 1)
+				if err != nil {
+					log.Printf("query suggestion err:%v\n", err)
+					return model.Comment{}, err
+				}
+				comment.Suggestion = append(comment.Suggestion, suggestion)
+				exist = true
+			}
+		}
+		if exist {
+			return comment, err
+		}
+		//全部小于30
+		return comment, err
+	} else if grades[8] < 60 {
+		//有大于40的
+		for i := 0; i < len(grades)-1; i++ {
+			if grades[i] >= 40 {
+				comment.Result = append(comment.Result, map3[i])
+				suggestion, err := dao.QuerySuggestion(i + 1)
+				if err != nil {
+					log.Printf("query suggestion err:%v\n", err)
+					return model.Comment{}, err
+				}
+				comment.Suggestion = append(comment.Suggestion, suggestion)
+				log.Println(i)
+				exist = true
+			}
+		}
+		if exist {
+			comment.Result = append(comment.Result, "是")
+			return comment, err
+		}
+		//都小于40，有30-39的
+		for i := 0; i < len(grades)-1; i++ {
+			if grades[i] < 40 && grades[i] >= 30 {
+				comment.Result = append(comment.Result, map3[i+1])
+				suggestion, err := dao.QuerySuggestion(i + 1)
+				if err != nil {
+					log.Printf("query suggestion err:%v\n", err)
+					return model.Comment{}, err
+				}
+				comment.Suggestion = append(comment.Suggestion, suggestion)
+				exist = true
+			}
+		}
+		if exist {
+			comment.Result = append(comment.Result, "倾向是")
+			return comment, err
+		}
+		//都小于30
+		comment.Result = append(comment.Result, map3[9])
+		suggestion, err := dao.QuerySuggestion(9)
+		if err != nil {
+			log.Printf("query suggestion err:%v\n", err)
+			return model.Comment{}, err
+		}
+		comment.Suggestion = append(comment.Suggestion, suggestion)
+		return comment, err
+	} else {
+		return model.Comment{}, errors.New("未知错误")
+	}
+}
+
+// GenExcel 实现生成excel表功能
+func GenExcel(userId int) (filename string, err error) {
 	var record, record2 int
 	var cell string
 	// 获取当前工作目录
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Printf("os.getwd err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	// 创建一个新的 Excel 文件
-	f = excelize.NewFile()
+	f := excelize.NewFile()
 	// 创建一个名为 Sheet1 的表格
 	index, err := f.NewSheet("Sheet1")
 	if err != nil {
 		log.Printf("new sheet err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	// 设置默认工作薄
 	f.SetActiveSheet(index)
@@ -170,14 +291,14 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 	err = f.SetSheetName("Sheet1", "选项与得分")
 	if err != nil {
 		log.Printf("set sheet name err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	// 写入
 	for questionnaireId := 1; ; questionnaireId++ {
 		questionnaire, err := dao.QueryQuestionnaire(questionnaireId)
 		if err != nil && err != sql.ErrNoRows {
 			log.Printf("query questionnaire err:%v\n", err)
-			return "", nil, err
+			return "", err
 		}
 		if questionnaire != "" {
 			// 写入questionnaire
@@ -185,18 +306,18 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 			err = f.SetCellValue("选项与得分", cell, questionnaire)
 			if err != nil {
 				log.Printf("set cell value err:%v\n", err)
-				return "", nil, err
+				return "", err
 			}
 			cell = fmt.Sprintf("A%d", 2*questionnaireId)
 			err = f.SetCellValue("选项与得分", cell, "选项")
 			if err != nil {
 				log.Printf("set cell value err:%v\n", err)
-				return "", nil, err
+				return "", err
 			}
 			questions, err := dao.QueryQuestion(questionnaireId)
 			if err != nil && err != sql.ErrNoRows {
 				log.Printf("query question err:%v\n", err)
-				return "", nil, err
+				return "", err
 			}
 			for k, question := range questions {
 				// 写问题
@@ -204,25 +325,32 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 				err = f.SetCellValue("选项与得分", cell, question.Question)
 				if err != nil {
 					log.Printf("set cell value err:%v\n", err)
-					return "", nil, err
+					return "", err
 				}
 				// 写答案
 				cell = fmt.Sprintf("%c%d", 'A'+k+1, 2*questionnaireId)
 				// 先找一下答案
 				answer, err := dao.QuerySubmitAnswer(userId, questionnaireId, question.QuestionId)
 				if answer == "" {
-					log.Println("用户答案未提交完全")
-					return "", nil, errors.New("用户答案未提交完全")
+					if questionnaireId != 5 || (questionnaireId == 5 && question.QuestionId != 6 && question.QuestionId != 7) {
+						log.Println("用户答案未提交完全")
+						return "", errors.New("用户答案未提交完全")
+					}
 				}
-				if err != nil {
+				if err != nil && err != sql.ErrNoRows {
 					log.Printf("query submit answer err:%v\n", err)
-					return "", nil, err
+					return "", err
 				}
 				// 写
-				err = f.SetCellValue("选项与得分", cell, answer)
-				if err != nil {
-					log.Printf("set cell value err:%v\n", err)
-					return "", nil, err
+				//if err == sql.ErrNoRows {
+				//	log.Println(questionnaireId, question.QuestionId, answer)
+				//}
+				if answer != "" {
+					err = f.SetCellValue("选项与得分", cell, answer)
+					if err != nil {
+						log.Printf("set cell value err:%v\n", err)
+						return "", err
+					}
 				}
 				//记录一下，出循环后用
 				record = 'A' + k + 1
@@ -232,19 +360,19 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 			err = f.SetCellValue("选项与得分", cell, "得分")
 			if err != nil {
 				log.Printf("set cell value err:%v\n", err)
-				return "", nil, err
+				return "", err
 			}
 			cell = fmt.Sprintf("%c%d", record+1, record2+1)
 			//找一下得分
 			grade, err := dao.QueryGrade(userId, questionnaireId)
 			if err != nil {
 				log.Printf("query err:%v\n", err)
-				return "", nil, err
+				return "", err
 			}
 			err = f.SetCellValue("选项与得分", cell, grade)
 			if err != nil {
 				log.Printf("set cell value err:%v\n", err)
-				return "", nil, err
+				return "", err
 			}
 		} else {
 			break
@@ -257,12 +385,12 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 			Vertical:   "center"}})
 	if err != nil {
 		log.Printf("center style err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	err = f.SetCellStyle("选项与得分", "A1", cell, centerStyle)
 	if err != nil {
 		log.Printf("set cell style err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	//row := []interface{}{"1", nil, 2}
 	//err = f.SetSheetRow("选项与得分", "A1", &row)
@@ -271,18 +399,18 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 	err = f.SetColWidth("选项与得分", "A", "A", 10)
 	if err != nil {
 		log.Printf("set col1 err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	err = f.SetColWidth("选项与得分", "B", endCol, 45)
 	if err != nil {
 		log.Printf("set col width err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	for i := 1; i <= record2+1; i++ {
 		err := f.SetRowHeight("选项与得分", i, 20)
 		if err != nil {
 			log.Printf("set row height err:%v\n", err)
-			return "", nil, err
+			return "", err
 		}
 	}
 	// 保存 Excel 文件
@@ -290,12 +418,12 @@ func GenExcel(userId int) (filename string, f *excelize.File, err error) {
 	err, username := dao.SearchUsernameByUserId(userId)
 	if err != nil {
 		log.Printf("search username err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
 	filename = fmt.Sprintf("/%s-中医智慧诊疗诊断表.xlsx", username)
-	if err := f.SaveAs(wd + filename); err != nil {
+	if err := f.SaveAs(wd + "/excel" + filename); err != nil {
 		log.Printf("save file err:%v\n", err)
-		return "", nil, err
+		return "", err
 	}
-	return filename, f, nil
+	return filename, nil
 }

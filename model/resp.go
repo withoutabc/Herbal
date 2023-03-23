@@ -35,3 +35,9 @@ type Result struct {
 	QuestionId int `json:"question_id" form:"question_id"`
 	OptionId   int `json:"option_id" form:"option_id"`
 }
+
+type RespPicture struct {
+	Status int    `json:"status"`
+	Info   string `json:"info"`
+	Path   string `json:"path"`
+}

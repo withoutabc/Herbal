@@ -50,3 +50,10 @@ func NormErr(c *gin.Context, status int, info string) {
 		info,
 	})
 }
+
+func RespErr(c *gin.Context, status int, err error) {
+	c.JSON(http.StatusBadRequest, respTemplate{
+		status,
+		err.Error(),
+	})
+}

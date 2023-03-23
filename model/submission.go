@@ -11,3 +11,14 @@ type Test struct {
 	QuestionId int `json:"question_id"`
 	AnswerId   int `json:"answer_id"`
 }
+
+type Comment struct {
+	Result     []string `json:"result"`
+	Suggestion []string `json:"suggestion"`
+}
+
+type RespComment struct {
+	Status int     `json:"status"`
+	Info   string  `json:"info"`
+	Data   Comment `json:"data"`
+}

@@ -81,3 +81,8 @@ func QueryGrade(userId int, questionnaireId int) (grade int, err error) {
 	err = DB.QueryRow(sqL.String(), userId).Scan(&grade)
 	return grade, err
 }
+
+func QuerySuggestion(questionnaireId int) (suggestion string, err error) {
+	err = DB.QueryRow("select suggestion from questionnaire where questionnaire_id=?", questionnaireId).Scan(&suggestion)
+	return suggestion, err
+}

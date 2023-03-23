@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 	"herbalBody/service"
 	"herbalBody/util"
 	"log"
@@ -11,14 +13,14 @@ import (
 
 func GetExcel(c *gin.Context) {
 	//先生成xlsx文件
-	userId := c.PostForm("user_id")
+	userId := c.Param("user_id")
 	ID, err := strconv.Atoi(userId)
 	if err != nil {
 		util.RespInternalErr(c)
 		log.Printf("strconv atoi err:%v\n", err)
 		return
 	}
-	filename, f, err := service.GenExcel(ID)
+	filename, err := service.GenExcel(ID)
 	if err != nil {
 		if err.Error() == "用户答案未提交完全" {
 			log.Printf("gen excel err:%v", err.Error())
@@ -27,6 +29,11 @@ func GetExcel(c *gin.Context) {
 		}
 		util.RespInternalErr(c)
 		log.Printf("gen excel err:%v\n", err)
+		return
+	}
+	f, err := excelize.OpenFile("./excel/" + filename[1:])
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	// 提供下载
