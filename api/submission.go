@@ -24,6 +24,10 @@ func ReceiveSubmission(c *gin.Context) {
 	//保存提交结果
 	err = service.Submit(s)
 	if err != nil {
+		if err.Error() == "没有对应的问卷页" {
+			util.RespErr(c, 451, err)
+			return
+		}
 		log.Printf("submit err:%v\n", err)
 		util.RespInternalErr(c)
 		return
@@ -66,7 +70,7 @@ func Upload(c *gin.Context) {
 	c.JSON(http.StatusOK, model.RespPicture{
 		Status: 200,
 		Info:   "upload success",
-		Path:   wd + "picture/" + newName,
+		Path:   wd + "/picture/" + newName,
 	})
 }
 

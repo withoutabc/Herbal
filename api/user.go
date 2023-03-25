@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"herbalBody/model"
 	"herbalBody/service"
@@ -69,7 +70,7 @@ func Login(c *gin.Context) {
 	err, user := service.SearchUserByName(u.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			util.NormErr(c, 443, "登录：用户名不存在")
+			util.NormErr(c, 444, "登录：用户名不存在")
 			return
 		} else {
 			log.Printf("search password err:%v\n", err)
@@ -79,7 +80,7 @@ func Login(c *gin.Context) {
 	}
 	//验证密码是否正确
 	if user.Password != u.Password {
-		util.NormErr(c, 444, "登录：密码错误")
+		util.NormErr(c, 445, "登录：密码错误")
 		return
 	}
 	//成功登录，设置token
@@ -102,31 +103,35 @@ func Login(c *gin.Context) {
 }
 
 func Refresh(c *gin.Context) {
-	refreshToken := c.PostForm("refresh_token")
-	if refreshToken == "" {
+	var rt model.RefreshToken
+	err := c.ShouldBind(&rt)
+	if err != nil {
 		util.RespParamErr(c)
+		log.Printf("should bind err:%v\n", err)
 		return
 	}
-	claims, err := service.ParseToken(refreshToken)
+	accessToken, refreshToken, claims, err := service.RefreshToken(rt.RefreshToken)
 	if err != nil {
-		util.NormErr(c, 445, err.Error())
-		log.Printf("parse token err:%v\n", err)
-		return
-	}
-	str := claims.UserId
-	//生成新的token
-	accessToken, refreshToken, Claims, err := service.GenToken(str)
-	if err != nil {
+		if err.Error() == "错误的类型" {
+			util.RespErr(c, 451, err)
+			log.Println(err)
+			return
+		}
+		if err.Error() == "invalid refresh token signature" {
+			util.RespErr(c, 452, err)
+			log.Println(err)
+			return
+		}
+		util.RespErr(c, 453, errors.New("invalid token"))
 		log.Printf("refresh token err:%v\n", err)
-		util.RespInternalErr(c)
 		return
 	}
 	c.JSON(http.StatusOK, model.RespToken{
 		Status: 200,
 		Info:   "refresh token success",
 		Data: model.Login{
-			UserId:       str,
-			LoginTime:    Claims.LoginTime,
+			UserId:       claims.UserId,
+			LoginTime:    claims.LoginTime,
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 		},

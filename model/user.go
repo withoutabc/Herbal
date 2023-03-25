@@ -18,8 +18,13 @@ type LoginUser struct {
 	Password string `json:"password" form:"password" binding:"required"`
 }
 
+type RefreshToken struct {
+	RefreshToken string `json:"refresh_token" form:"refresh_token" binding:"required"`
+}
+
 type MyClaims struct {
 	UserId    int
 	LoginTime time.Time
+	Type      string
 	jwt.StandardClaims
 }

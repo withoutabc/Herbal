@@ -19,17 +19,23 @@ func GenToken(userId int) (aToken, rToken string, c model.MyClaims, err error) {
 	c = model.MyClaims{
 		UserId:    userId,
 		LoginTime: time.Now(),
+		Type:      "access",
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour).Unix(), // 过期时间
-			Issuer:    "YJX",                            // 签发人
+			ExpiresAt: time.Now().Add(time.Minute * 30).Unix(), // 过期时间
+			Issuer:    "YJX",                                   // 签发人
 		},
 	}
 	// 加密并获得完整的编码后的字符串token
 	aToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, c).SignedString(Secret)
 	// refresh token 不需要存任何自定义数据
-	rToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Second * 24).Unix(), // 过期时间
-		Issuer:    "YJX",                                   // 签发人
+	rToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, model.MyClaims{
+		UserId:    userId,
+		LoginTime: time.Now(),
+		Type:      "refresh",
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // 过期时间
+			Issuer:    "YJX",                                 // 签发人
+		},
 	}).SignedString(Secret)
 	// 使用指定的secret签名并获得完整的编码后的字符串token
 	return
@@ -43,9 +49,14 @@ func RefreshToken(rToken string) (newAToken, newRToken string, c model.MyClaims,
 		if err == jwt.ErrSignatureInvalid {
 			return "", "", model.MyClaims{}, errors.New("invalid refresh token signature")
 		}
+		return "", "", model.MyClaims{}, err
+	}
+	//判断类型是否正确
+	if claims.Type != "refresh" {
+		return "", "", model.MyClaims{}, errors.New("错误的类型")
 	}
 	//生成新的token
-	newAToken, newRToken, _, err = GenToken(claims.UserId)
+	newAToken, newRToken, c, err = GenToken(claims.UserId)
 	if err != nil {
 		return "", "", model.MyClaims{}, err
 	}

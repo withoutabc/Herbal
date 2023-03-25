@@ -40,6 +40,14 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			c.Abort()
 			return
 		}
+		if mc.Type != "access" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": 2006,
+				"info":   "错误的Token类型",
+			})
+			c.Abort()
+			return
+		}
 		c.Set("user_id", mc.UserId)
 		c.Next()
 	}

@@ -17,9 +17,9 @@ func InitRouter() {
 	r.GET("/questionnaire", GetQuestionnaire)
 	{
 		r.POST("/submit", middleware.JWTAuthMiddleware(), ReceiveSubmission)
-		r.GET("/excel/:user_id", GetExcel)  //jwt
-		r.POST("/upload/:user_id", Upload)  //jwt
-		r.GET("/comment/:user_id", Comment) //jwt}
+		r.GET("/excel/:user_id", middleware.JWTAuthMiddleware(), GetExcel)
+		r.POST("/upload/:user_id", middleware.JWTAuthMiddleware(), Upload)
+		r.GET("/comment/:user_id", middleware.JWTAuthMiddleware(), Comment)
 	}
-	r.Run(":80")
+	r.Run(":10")
 }
