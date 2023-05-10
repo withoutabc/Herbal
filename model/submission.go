@@ -8,8 +8,8 @@ type Submission struct {
 }
 
 type Test struct {
-	QuestionId int `json:"question_id"`
-	AnswerId   int `json:"answer_id"`
+	QuestionId int `json:"question_id" form:"question_id" binding:"required"`
+	AnswerId   int `json:"answer_id" form:"answer_id" binding:"required"`
 }
 
 type Comment struct {

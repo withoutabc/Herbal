@@ -37,7 +37,7 @@ func RespInternalErr(c *gin.Context) {
 
 var UnauthorizedErr = respTemplate{
 	Status: 401,
-	Info:   "unauthorized",
+	Info:   "wrong role",
 }
 
 func RespUnauthorizedErr(c *gin.Context) {

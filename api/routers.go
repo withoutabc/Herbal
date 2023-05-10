@@ -10,16 +10,26 @@ func InitRouter() {
 	r.Use(middleware.CORS())
 	u := r.Group("/user")
 	{
-		u.POST("/register", Register)
-		u.POST("/login", Login)
-		u.POST("/refresh", middleware.JWTAuthMiddleware(), Refresh)
+		uai := NewUserApi()
+		u.POST("/register", uai.Register)
+		u.POST("/login", uai.Login)
+		u.POST("/refresh", middleware.JWTAuthMiddleware(), uai.Refresh)
 	}
+
 	r.GET("/questionnaire", GetQuestionnaire)
 	{
-		r.POST("/submit", middleware.JWTAuthMiddleware(), ReceiveSubmission)
-		r.GET("/excel/:user_id", middleware.JWTAuthMiddleware(), GetExcel)
-		r.POST("/upload/:user_id", middleware.JWTAuthMiddleware(), Upload)
-		r.GET("/comment/:user_id", middleware.JWTAuthMiddleware(), Comment)
+		qal := NewSubmissionApi()
+		r.POST("/submit", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), qal.ReceiveSubmission)
+		eal := NewExcelApi()
+		r.POST("/gen/excel/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), eal.GenExcel)
+		r.POST("/upload/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), Upload)
+		r.GET("/comment/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), qal.GetComment)
+	}
+	r.GET("/excels/zips", GetExcelZips)
+
+	{
+		pal := NewPromiseApi()
+		r.POST("/promise", middleware.JWTAuthMiddleware(), pal.QueryPromises)
 	}
 	r.Run(":10")
 }

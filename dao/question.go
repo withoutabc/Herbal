@@ -6,7 +6,7 @@ import (
 
 // QueryOption 根据问卷id和问题id找选项
 func QueryOption(questionnaireId, questionId int) (options []model.Op, err error) {
-	rows, err := DB.Query("select `option` ,  option_id from `option`where questionnaire_id=? and question_id=?", questionnaireId, questionId)
+	rows, err := DB.Query("select `option` ,  option_id from `options`where questionnaire_id=? and question_id=?", questionnaireId, questionId)
 	if err != nil || rows.Err() != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func QueryOption(questionnaireId, questionId int) (options []model.Op, err error
 
 // QueryQuestion 根据问卷id找问题
 func QueryQuestion(questionnaireId int) (questions []model.Ques, err error) {
-	rows, err := DB.Query("select question , question_id from question where questionnaire_id=?", questionnaireId)
+	rows, err := DB.Query("select question , question_id from questions where questionnaire_id=?", questionnaireId)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func QueryQuestion(questionnaireId int) (questions []model.Ques, err error) {
 }
 
 func QueryQuestionnaire(questionnaireId int) (questionnaire string, err error) {
-	err = DB.QueryRow("select questionnaire from questionnaire where questionnaire_id=?", questionnaireId).Scan(&questionnaire)
+	err = DB.QueryRow("select questionnaire from questionnaires where questionnaire_id=?", questionnaireId).Scan(&questionnaire)
 	if err != nil {
 		return "", err
 	}

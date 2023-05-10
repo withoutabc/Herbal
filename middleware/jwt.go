@@ -49,6 +49,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			return
 		}
 		c.Set("user_id", mc.UserId)
+		c.Set("role", mc.Role)
 		c.Next()
 	}
 }

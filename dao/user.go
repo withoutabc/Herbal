@@ -1,22 +1,52 @@
 package dao
 
-import "herbalBody/model"
+import (
+	"database/sql"
+	"gorm.io/gorm"
+	"herbalBody/model"
+)
 
-func SearchUserByName(username string) (err error, u model.LoginUser) {
-	row := DB.QueryRow("select * from user where username=?", username)
-	if err = row.Err(); err != nil {
-		return nil, model.LoginUser{}
-	}
-	err = row.Scan(&u.UserId, &u.Username, &u.Password)
-	return err, u
+type UserDaoImpl struct {
+	db  *sql.DB
+	gdb *gorm.DB
 }
 
-func InsertUser(u model.RegisterUser) (err error) {
-	_, err = DB.Exec("insert into user (username,password) values(?,?)", u.Username, u.Password)
-	return err
+func (u *UserDaoImpl) SearchUserByUsername(username string) (user model.User, err error) {
+	var tempUser model.User
+	result := u.gdb.Where(&model.User{
+		Username: username,
+	}).First(&tempUser)
+	return tempUser, result.Error
+}
+
+func (u *UserDaoImpl) InsertUser(registerUser model.RegisterUser) (err error) {
+	result := u.gdb.Create(&model.User{
+		UserId:   registerUser.UserId,
+		Username: registerUser.Username,
+		Password: registerUser.Password,
+		Role:     registerUser.Role,
+	})
+	return result.Error
+}
+func (u *UserDaoImpl) SearchUserIdByUsername(username string) (int, error) {
+	var user model.User
+	result := u.gdb.Where(&model.User{Username: username}).First(&user)
+	return user.UserId, result.Error
+}
+
+func (u *UserDaoImpl) InsertSignature(userId int) (err error) {
+	result := u.gdb.Create(&model.Signature{UserId: userId})
+	return result.Error
+}
+
+func NewUserDao() *UserDaoImpl {
+	return &UserDaoImpl{
+		db:  DB,
+		gdb: GDB,
+	}
 }
 
 func SearchUsernameByUserId(userId int) (err error, username string) {
-	err = DB.QueryRow("select username from user where user_id=?", userId).Scan(&username)
+	err = DB.QueryRow("select username from users where user_id=?", userId).Scan(&username)
 	return err, username
 }

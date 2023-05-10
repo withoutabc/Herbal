@@ -14,10 +14,11 @@ func keyFunc(*jwt.Token) (i interface{}, err error) {
 }
 
 // GenToken GenToken生成aToken和rToken
-func GenToken(userId int) (aToken, rToken string, c model.MyClaims, err error) {
+func GenToken(userId int, role string) (aToken, rToken string, c model.MyClaims, err error) {
 	// 创建一个我们自己的声明
 	c = model.MyClaims{
 		UserId:    userId,
+		Role:      role,
 		LoginTime: time.Now(),
 		Type:      "access",
 		StandardClaims: jwt.StandardClaims{
@@ -30,6 +31,7 @@ func GenToken(userId int) (aToken, rToken string, c model.MyClaims, err error) {
 	// refresh token 不需要存任何自定义数据
 	rToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, model.MyClaims{
 		UserId:    userId,
+		Role:      role,
 		LoginTime: time.Now(),
 		Type:      "refresh",
 		StandardClaims: jwt.StandardClaims{
@@ -56,7 +58,7 @@ func RefreshToken(rToken string) (newAToken, newRToken string, c model.MyClaims,
 		return "", "", model.MyClaims{}, errors.New("错误的类型")
 	}
 	//生成新的token
-	newAToken, newRToken, c, err = GenToken(claims.UserId)
+	newAToken, newRToken, c, err = GenToken(claims.UserId, claims.Role)
 	if err != nil {
 		return "", "", model.MyClaims{}, err
 	}

@@ -4,6 +4,7 @@ import "time"
 
 type Login struct {
 	UserId       int       `json:"user_id"`
+	Role         string    `json:"role"`
 	LoginTime    time.Time `json:"login_time"`
 	AccessToken  string    `json:"access_token"`
 	RefreshToken string    `json:"refresh_token"`

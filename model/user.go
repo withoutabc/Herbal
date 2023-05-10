@@ -10,6 +10,7 @@ type RegisterUser struct {
 	Username        string `json:"username" form:"username" binding:"required"`
 	Password        string `json:"password" form:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password" binding:"required"`
+	Role            string `json:"role" form:"role" binding:"required"`
 }
 
 type LoginUser struct {
@@ -24,6 +25,7 @@ type RefreshToken struct {
 
 type MyClaims struct {
 	UserId    int
+	Role      string
 	LoginTime time.Time
 	Type      string
 	jwt.StandardClaims
