@@ -1,0 +1,2 @@
+[2023-02-26 01:08:23] [1;47m[DEB][0m .\src\lg3\test\log3.go:6                | main.[36mmain[0m                      | "666"
+[2023-02-26 01:33:59] [1;47m[DEB][0m .\src\lg3\test\log3.go:6                | main.[36mmain[0m                      | "debug"

@@ -1,0 +1,42 @@
+[2023-02-23 16:04:39] [46m[INF][0m log.go:104 gorm_demo1/src/lg.Info [12]
+[2023-02-23 16:05:05] [46m[INF][0m log.go:104 gorm_demo1/src/lg.Info [12]
+[2023-02-23 16:06:21] [46m[INF][0m log.go:104 gorm_demo1/src/lg.Info 12
+[2023-02-23 17:50:19] [46m[INF][0m log.go:97 gorm_demo1/src/lg.Info 12
+[2023-02-23 18:48:29] [46m[INF][0m F:/goland/gogogo/gorm_demo1/src/lg:97 gorm_demo1/src/lg.Info 12
+[2023-02-23 18:49:03] [46m[INF][0m .go:97 gorm_demo1/src/lg.Info 12
+[2023-02-23 18:49:44] [46m[INF][0m F:/goland/gogogo/gorm_demo1/src/lglog.go:97 gorm_demo1/src/lg.Info 12
+[2023-02-23 18:49:55] [46m[INF][0m F:/goland/gogogo/gorm_demo1/src/lg/log.go:97 gorm_demo1/src/lg.Info 12
+[2023-02-23 18:53:40] [46m[INF][0m F:\goland\gogogo\gorm_demo1\src\lg/log.go:98 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:04:21] [46m[INF][0m src\lg:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:04:47] [46m[INF][0m .\src\lg:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:05:57] [46m[INF][0m .\src\lglog.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:06:23] [46m[INF][0m .\src\lg\log.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:07:57] [46m[INF][0m .\src\lg\log.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:08:05] [46m               [INF][0m .\src\lg\log.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:08:14] [46m[INF][0m .\src\lg\log.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:08:20] [46m[INF][0m                                                                                                                                                                                                                       .\src\lg\log.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:08:25] [46m[INF][0m     .\src\lg\log.go:106 gorm_demo1/src/lg.Info 12
+[2023-02-23 19:08:34] [46m[INF][0m .\src\lg\log.go:106     gorm_demo1/src/lg.Info 12
+[2023-02-23 19:08:46] [46m[INF][0m .\src\lg\log.go:106                      gorm_demo1/src/lg.Info 12
+[2023-02-24 00:21:52] [46m[INF][0m .\src\lg\log.go:160                      gorm_demo1/src/lg.Info 12
+[2023-02-24 00:28:56] [46m[INF][0m .\src\lg\log.go:167                      gorm_demo1/src/lg.Info 12
+[2023-02-24 00:29:33] [46m[INF][0m .\src\lg\log.go:167                      gorm_demo1/src/lg.Info 12
+[2023-02-24 00:30:42] [46m[INF][0m .\src\lg\log.go:167                      gorm_demo1/src/lg.Info 12
+[2023-02-24 00:44:08] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:gorm_demo1/src/lg.(*LogFormatter2).Format, file:log.go, line:135 
+[2023-02-24 00:44:29] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:gorm_demo1/src/lg.getCallerInfo, file:log.go, line:83 
+[2023-02-24 00:44:52] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:github.com/sirupsen/logrus.(*Entry).log, file:entry.go, line:252 
+[2023-02-24 00:45:34] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:github.com/sirupsen/logrus.(*Entry).Log, file:entry.go, line:304 
+[2023-02-24 00:45:39] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:github.com/sirupsen/logrus.(*Entry).Logln, file:entry.go, line:394 
+[2023-02-24 00:45:46] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:github.com/sirupsen/logrus.(*Logger).Logln, file:logger.go, line:298 
+[2023-02-24 00:45:52] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:github.com/sirupsen/logrus.(*Logger).Infoln, file:logger.go, line:312 
+[2023-02-24 00:45:58] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:gorm_demo1/src/lg.Info, file:log.go, line:182 
+[2023-02-24 00:46:49] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
+FuncName:main.main, file:test.go, line:10 
