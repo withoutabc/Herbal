@@ -40,5 +40,5 @@ type Result struct {
 type RespPicture struct {
 	Status int    `json:"status"`
 	Info   string `json:"info"`
-	Path   string `json:"path"`
+	Path   string `json:"path"` //图片在服务器上的路径
 }

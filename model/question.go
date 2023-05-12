@@ -1,5 +1,7 @@
 package model
 
+//这一页似乎已经不用了
+
 type RespQuestionnaire struct {
 	Status int             `json:"status" form:"status"`
 	Data   []Questionnaire `json:"data" form:"data "`

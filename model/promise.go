@@ -1,7 +1,7 @@
 package model
 
 type Version struct {
-	VersionId int    `json:"version_id" gorm:"primaryKey"`
+	VersionId int    `json:"version_id" gorm:"primaryKey"` //承诺书版本号，目前是1
 	Version   string `json:"version" gorm:"not null"`
 }
 
@@ -18,11 +18,6 @@ type List struct {
 	List      string `json:"list" gorm:"not null"`
 }
 
-type Signature struct {
-	UserId        int `json:"user_id" gorm:"not null"`
-	PromiseStatus int `json:"promise_status" gorm:"not null"`
-}
-
 type Promises struct {
 	Version  string         `json:"version"`
 	Promise  []PromisesPart `json:"promise"`
@@ -32,6 +27,12 @@ type Promises struct {
 type PromisesPart struct {
 	Title string   `json:"title"`
 	List  []string `json:"list"`
+}
+
+// Signature 记录用户是否签订协议
+type Signature struct {
+	UserId        int `json:"user_id" gorm:"not null"`
+	PromiseStatus int `json:"promise_status" gorm:"not null"` // 0==>未签 1==>签订
 }
 
 type RespPromises struct {

@@ -10,7 +10,7 @@ type RegisterUser struct {
 	Username        string `json:"username" form:"username" binding:"required"`
 	Password        string `json:"password" form:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password" binding:"required"`
-	Role            string `json:"role" form:"role" binding:"required"`
+	Role            string `json:"role" form:"role" binding:"required"` //角色，详见roleAuth.go
 }
 
 type LoginUser struct {
@@ -25,8 +25,8 @@ type RefreshToken struct {
 
 type MyClaims struct {
 	UserId    int
-	Role      string
-	LoginTime time.Time
-	Type      string
+	Role      string    //角色，详见roleAuth.go
+	LoginTime time.Time //登录时间
+	Type      string    //token类型
 	jwt.StandardClaims
 }

@@ -6,6 +6,7 @@ import (
 	"herbalBody/util"
 )
 
+// CommonAuth 普通用户认证
 func CommonAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, ok := c.Get("role")
@@ -23,6 +24,7 @@ func CommonAuth() gin.HandlerFunc {
 	}
 }
 
+// AdministratorAuth 管理员认证
 func AdministratorAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, ok := c.Get("role")
@@ -41,6 +43,7 @@ func AdministratorAuth() gin.HandlerFunc {
 	}
 }
 
+// MedicAuth 医护人员认证
 func MedicAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, ok := c.Get("role")
