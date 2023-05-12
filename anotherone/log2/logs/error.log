@@ -244,3 +244,6 @@ FuncName:main.main04, file:test.go, line:13
 [2023-03-07 22:38:22] [1;41m[ERR][0m .\test\test01\test.go:19                | main.[36mmain04[0m                    | "err"
 [2023-05-11 23:11:37] [1;41m[ERR][0m .\src\cmd\main.go:14                    | main.[36mmain[0m                      | "aaa"
 [2023-05-11 23:11:58] [1;41m[ERR][0m .\src\cmd\main.go:15                    | main.[36mmain[0m                      | "aaa"
+[2023-05-12 15:51:20] [1;41m[ERR][0m .\anotherone\dao2\dao.go:25             | herbalBody/anotherone/dao2.[36mInitDB2[0m| "<nil>"
+[2023-05-12 15:51:54] [1;41m[ERR][0m .\anotherone\dao2\dao.go:25             | herbalBody/anotherone/dao2.[36mInitDB2[0m| "<nil>"
+[2023-05-12 15:55:51] [1;41m[ERR][0m .\anotherone\service2\auth.go:54        | herbalBody/anotherone/service2.[36mAuth[0m| "json解析出错  unexpected end of JSON input"

@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"herbalBody/anotherone/log2"
 	"herbalBody/model"
-	"log"
 )
 
 var (
@@ -18,11 +18,17 @@ var (
 func InitDB2() {
 	db, err := sql.Open("mysql", viper.GetString("mysql.dsn"))
 	if err != nil {
-		log.Fatalf("connect mysql err:%v", err)
+		log2.Error("mysql: connect failed..., err: :", err)
 		return
 	}
 	DB = db
-	log.Println(db.Ping())
+	err = db.Ping()
+	if err != nil {
+		log2.Error(err)
+		return
+	}
+	log2.Info("mysql init success")
+
 }
 
 func GetDB2() *sql.DB {
@@ -33,15 +39,15 @@ func GetGDB2() *gorm.DB {
 	return GDB
 }
 
-// ConnectGorm Connect gorm连接
+// ConnectGorm2 Connect gorm连接
 func ConnectGorm2() {
 	dsn := viper.GetString("mysql.dsn")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		log2.Error("gorm: failed to connect database")
 	}
 	GDB = db
-	log.Println("连接成功")
+	log2.Info("gorm init success")
 	GDB.AutoMigrate(&model.Questions{})
 	GDB.AutoMigrate(&model.Option{})
 	GDB.AutoMigrate(&model.User{})

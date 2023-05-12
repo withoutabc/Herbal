@@ -33,3 +33,18 @@ func codeAndError(c *gin.Context, err errutil.CodeError) {
 		"msg":    err.Error(),
 	})
 }
+
+func jsonData(c *gin.Context, data any) {
+	c.JSON(http.StatusOK, gin.H{
+		"status": codes.OK,
+		"msg":    "获取数据成功",
+		"data":   data,
+	})
+}
+
+func jsonSuccess(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status": codes.OK,
+		"msg":    "操作成功",
+	})
+}

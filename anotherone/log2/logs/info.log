@@ -40,3 +40,9 @@ FuncName:github.com/sirupsen/logrus.(*Logger).Infoln, file:logger.go, line:312
 FuncName:gorm_demo1/src/lg.Info, file:log.go, line:182 
 [2023-02-24 00:46:49] [46m[INF][0m .\src\lg\log.go:182                      gorm_demo1/src/lg.Info 12
 FuncName:main.main, file:test.go, line:10 
+[2023-05-12 15:51:20] [1;44m[INF][0m .\anotherone\dao2\dao.go:44             | herbalBody/anotherone/dao2.[36mConnectGorm2[0m| "连接成功"
+[2023-05-12 15:51:54] [1;44m[INF][0m .\anotherone\dao2\dao.go:44             | herbalBody/anotherone/dao2.[36mConnectGorm2[0m| "连接成功"
+[2023-05-12 15:55:40] [1;44m[INF][0m .\anotherone\dao2\dao.go:30             | herbalBody/anotherone/dao2.[36mInitDB2[0m| "mysql init success"
+[2023-05-12 15:55:40] [1;44m[INF][0m .\anotherone\dao2\dao.go:50             | herbalBody/anotherone/dao2.[36mConnectGorm2[0m| "gorm init success"
+[2023-05-12 16:44:23] [1;44m[INF][0m .\anotherone\dao2\dao.go:30             | herbalBody/anotherone/dao2.[36mInitDB2[0m| "mysql init success"
+[2023-05-12 16:44:23] [1;44m[INF][0m .\anotherone\dao2\dao.go:50             | herbalBody/anotherone/dao2.[36mConnectGorm2[0m| "gorm init success"

@@ -9,11 +9,8 @@ func InitRouters(r *gin.Engine) {
 	r.GET("")
 }
 func InitMyRouters() {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	r.GET("/hello", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"msg": "hello world",
-		})
-	})
+	r.GET("/user/auth/openID", OpenIDLogin)
 	r.Run(":" + viper.GetString("port"))
 }

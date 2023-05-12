@@ -184,11 +184,12 @@ var (
 )
 
 func init() {
+	const logDir = "./anotherone/log2/logs/"
 	myLogger, _ = New(StdConf())
-	debugLogger, _ = New(FileConf("./src/lg/logs/debug.log"))
-	infoLogger, _ = New(FileConf("./src/lg/logs/info.log"))
-	warnLogger, _ = New(FileConf("./src/lg/logs/warn.log"))
-	errorLogger, _ = New(FileConf("./src/lg/logs/error.log"))
+	debugLogger, _ = New(FileConf(logDir + "debug.log"))
+	infoLogger, _ = New(FileConf(logDir + "info.log"))
+	warnLogger, _ = New(FileConf(logDir + "warn.log"))
+	errorLogger, _ = New(FileConf(logDir + "error.log"))
 }
 
 //func init01() {

@@ -17,3 +17,13 @@ func NewWithCode(code int) CodeError {
 		reason: codes.CodeErrorMap[code],
 	}
 }
+
+func ToCodeError(code int, err error) error {
+	if err == nil {
+		return nil
+	}
+	return CodeError{
+		Code:   code,
+		reason: codes.CodeErrorMap[code],
+	}
+}
