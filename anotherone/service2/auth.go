@@ -81,9 +81,8 @@ func Auth(code, phoneData, iv string) (err error) {
 	var phone = phoneDto.PurePhoneNumber
 
 	//todo 下面这行用来检查是否获取成功（待删除）
+
 	PhoneNum = phone
-
-	//todo 用手机号注册用户获取用户信息等
-
+	//respLogin, err := dao2.InsertCommonUser(PhoneNum)
 	return
 }
