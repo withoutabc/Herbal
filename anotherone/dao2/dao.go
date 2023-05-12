@@ -3,10 +3,10 @@ package dao2
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	log2 "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"herbalBody/anotherone/log2"
 	"herbalBody/model"
 )
 

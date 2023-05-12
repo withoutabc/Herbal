@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"herbalBody/anotherone/api2"
 	"herbalBody/middleware"
 )
 
@@ -31,5 +32,9 @@ func InitRouter() {
 		pal := NewPromiseApi()
 		r.POST("/promise", middleware.JWTAuthMiddleware(), pal.QueryPromises)
 	}
+
+	//另外一边的接口
+	api2.InitRouters(r)
+
 	r.Run(":10")
 }

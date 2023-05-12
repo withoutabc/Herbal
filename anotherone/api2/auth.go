@@ -2,11 +2,13 @@ package api2
 
 import (
 	"github.com/gin-gonic/gin"
-	"herbalBody/anotherone/log2"
+	"herbalBody/anotherone/mylog"
 	"herbalBody/anotherone/service2"
 	"herbalBody/anotherone/util2/codes"
 	"herbalBody/anotherone/util2/errutil"
 )
+
+var log2 = mylog.Log
 
 // OpenIDLogin 登录接口
 func OpenIDLogin(c *gin.Context) {

@@ -3,12 +3,14 @@ package service2
 import (
 	"encoding/json"
 	"fmt"
-	"herbalBody/anotherone/log2"
+	"herbalBody/anotherone/mylog"
 	"herbalBody/anotherone/util2"
 	"herbalBody/anotherone/util2/codes"
 	"herbalBody/anotherone/util2/errutil"
 	"herbalBody/anotherone/util2/requester"
 )
+
+var log2 = mylog.Log
 
 //todo 下面这行用来检查是否获取成功（待删除）
 
