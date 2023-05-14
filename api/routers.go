@@ -33,17 +33,13 @@ func InitRouter() {
 	}
 	{
 		ial := NewInfoApi()
-		r.POST("/info/add", ial.AddInfo)
 		r.GET("/info/search/:user_id", ial.SearchInfo)
 		r.PUT("/info/update/:user_id", ial.UpdateInfo)
 
-		r.POST("/basic/add", ial.AddBasic)
 		r.GET("/basic/search/:user_id", ial.SearchBasic)
 
-		r.POST("/motor/add", ial.AddMotor)
 		r.GET("/motor/search/:user_id", ial.SearchMotor)
 
-		r.POST("/conclusion/add", ial.AddConclusion)
 		r.GET("/conclusion/search/:user_id", ial.SearchConclusion)
 		r.PUT("/conclusion/update/:user_id", ial.UpdateConclusion)
 	}
