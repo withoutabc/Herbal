@@ -74,7 +74,7 @@ func (u *UserDaoImpl) RegisterService(registerUser model.RegisterUser) (code int
 		return 100, err
 	}
 	//correct
-	return 0, tx.Commit().Error
+	return 0, nil
 }
 
 func (u *UserDaoImpl) LoginService(user model.LoginUser) (model.Login, int32, error) {

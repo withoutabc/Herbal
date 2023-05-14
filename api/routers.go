@@ -27,10 +27,25 @@ func InitRouter() {
 		r.GET("/comment/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), qal.GetComment)
 	}
 	r.GET("/excels/zips", GetExcelZips)
-
 	{
 		pal := NewPromiseApi()
 		r.POST("/promise", middleware.JWTAuthMiddleware(), pal.QueryPromises)
+	}
+	{
+		ial := NewInfoApi()
+		r.POST("/info/add", ial.AddInfo)
+		r.GET("/info/search/:user_id", ial.SearchInfo)
+		r.PUT("/info/update/:user_id", ial.UpdateInfo)
+
+		r.POST("/basic/add", ial.AddBasic)
+		r.GET("/basic/search/:user_id", ial.SearchBasic)
+
+		r.POST("/motor/add", ial.AddMotor)
+		r.GET("/motor/search/:user_id", ial.SearchMotor)
+
+		r.POST("/conclusion/add", ial.AddConclusion)
+		r.GET("/conclusion/search/:user_id", ial.SearchConclusion)
+		r.PUT("/conclusion/update/:user_id", ial.UpdateConclusion)
 	}
 
 	//另外一边的接口

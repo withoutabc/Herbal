@@ -28,6 +28,7 @@ func (u *UserDaoImpl) InsertUser(registerUser model.RegisterUser) (err error) {
 	})
 	return result.Error
 }
+
 func (u *UserDaoImpl) SearchUserIdByUsername(username string) (int, error) {
 	var user model.User
 	result := u.gdb.Where(&model.User{Username: username}).First(&user)

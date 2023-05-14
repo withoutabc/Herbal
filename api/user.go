@@ -9,12 +9,12 @@ import (
 	"net/http"
 )
 
-type UserApiImpl struct {
+type UserServiceImpl struct {
 	UserService
 }
 
-func NewUserApi() *UserApiImpl {
-	return &UserApiImpl{
+func NewUserApi() *UserServiceImpl {
+	return &UserServiceImpl{
 		UserService: service.NewUserServiceImpl(),
 	}
 }
@@ -25,7 +25,7 @@ type UserService interface {
 	RefreshTokenService(token model.RefreshToken) (model.Login, int32, error)
 }
 
-func (u *UserApiImpl) Register(c *gin.Context) {
+func (u *UserServiceImpl) Register(c *gin.Context) {
 	//接收数据
 	var registerUser model.RegisterUser
 	err := c.ShouldBind(&registerUser)
@@ -57,7 +57,7 @@ func (u *UserApiImpl) Register(c *gin.Context) {
 	util.RespOK(c, "register success")
 }
 
-func (u *UserApiImpl) Login(c *gin.Context) {
+func (u *UserServiceImpl) Login(c *gin.Context) {
 	//接收数据
 	var LoginUser model.LoginUser
 	err := c.ShouldBind(&LoginUser)
@@ -89,7 +89,7 @@ func (u *UserApiImpl) Login(c *gin.Context) {
 
 }
 
-func (u *UserApiImpl) Refresh(c *gin.Context) {
+func (u *UserServiceImpl) Refresh(c *gin.Context) {
 	//接收token
 	var rt model.RefreshToken
 	err := c.ShouldBind(&rt)

@@ -50,4 +50,8 @@ func ConnectGorm() {
 	GDB.AutoMigrate(&model.List{})
 	GDB.AutoMigrate(&model.Grade{})
 	GDB.AutoMigrate(&model.Signature{})
+	GDB.AutoMigrate(&model.BasicInfo{})
+	GDB.AutoMigrate(&model.BasicData{})
+	GDB.AutoMigrate(&model.MotorData{})
+	GDB.AutoMigrate(&model.Conclusion{})
 }
