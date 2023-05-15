@@ -24,7 +24,8 @@ type RefreshToken struct {
 }
 
 type ReqChangePwd struct {
-	Password string `json:"password" form:"password" binding:"required"`
+	OldPassword string `json:"old_password" form:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" form:"new_password" binding:"required"`
 }
 
 type MyClaims struct {

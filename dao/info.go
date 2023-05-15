@@ -22,7 +22,7 @@ func (i *InfoDaoImpl) SearchInfo(userId int) (info model.BasicInfo, err error) {
 }
 
 func (i *InfoDaoImpl) UpdateInfo(userId int, info model.BasicInfo) error {
-	result := i.gdb.Where(&model.BasicInfo{UserId: userId}).Updates(&info)
+	result := i.gdb.Take(&model.BasicInfo{}).Where(&model.BasicInfo{UserId: userId}).Updates(&info)
 	return result.Error
 }
 
@@ -57,7 +57,7 @@ func (i *InfoDaoImpl) SearchConclusion(userId int) (conclusion model.Conclusion,
 }
 
 func (i *InfoDaoImpl) UpdateConclusion(userId int, conclusion model.Conclusion) error {
-	result := i.gdb.Where(&model.Conclusion{UserId: userId}).Updates(&conclusion)
+	result := i.gdb.Take(&model.Conclusion{}).Where(&model.Conclusion{UserId: userId}).Updates(&conclusion)
 	return result.Error
 }
 

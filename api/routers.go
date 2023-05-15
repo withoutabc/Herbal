@@ -15,7 +15,7 @@ func InitRouter() {
 		u.POST("/register", uai.Register)
 		u.POST("/login", uai.Login)
 		u.POST("/refresh", middleware.JWTAuthMiddleware(), uai.Refresh)
-		u.POST("/password", middleware.JWTAuthMiddleware(), uai.ChangePassword)
+		u.POST("/password/:user_id", middleware.JWTAuthMiddleware(), uai.ChangePassword)
 	}
 
 	r.GET("/questionnaire", GetQuestionnaire)

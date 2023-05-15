@@ -24,7 +24,7 @@ type UserService interface {
 	RegisterService(model.RegisterUser) (code int32, err error)
 	LoginService(model.LoginUser) (model.Login, int32, error)
 	RefreshTokenService(token model.RefreshToken) (model.Login, int32, error)
-	ChangePassword(userId int, newPassword string) (code int)
+	ChangePassword(userId int, rcp model.ReqChangePwd) (code int)
 }
 
 func (u *UserServiceImpl) Register(c *gin.Context) {
@@ -130,12 +130,17 @@ func (u *UserServiceImpl) ChangePassword(c *gin.Context) {
 		return
 	}
 	//service
-	code := u.UserService.ChangePassword(IntUserId, ReqChangePwd.Password)
+	code := u.UserService.ChangePassword(IntUserId, ReqChangePwd)
 	switch code {
 	case util.ErrRowsAffectedCode:
-		util.NormErr(c, 1001, "数据更新失败")
+		util.NormErr(c, 1001, "数据更新失败（可能是重复）")
+		return
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
+	case util.WrongPasswordCode:
+		util.NormErr(c, 1002, "密码错误")
+		return
 	}
 	util.RespOK(c, "success")
 }

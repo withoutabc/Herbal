@@ -29,6 +29,7 @@ type UserDao interface {
 	InsertSignature(userId int) (err error)
 	SearchUserIdByUsername(string) (int, error)
 	UpdatePassword(userId int, password string) (err error)
+	SearchUserById(int) (model.User, error)
 }
 
 func (u *UserDaoImpl) RegisterService(registerUser model.RegisterUser) (code int32, err error) {
@@ -142,8 +143,17 @@ func (u *UserDaoImpl) RefreshTokenService(token model.RefreshToken) (model.Login
 	}, 0, nil
 }
 
-func (u *UserDaoImpl) ChangePassword(userId int, newPassword string) (code int) {
-	err := u.UserDao.UpdatePassword(userId, newPassword)
+func (u *UserDaoImpl) ChangePassword(userId int, rcp model.ReqChangePwd) (code int) {
+	//check password
+	user, err := u.UserDao.SearchUserById(userId)
+	if err != nil {
+		return util.InternalServerErrCode
+	}
+	if user.Password != rcp.OldPassword {
+		return util.WrongPasswordCode
+	}
+	//update password
+	err = u.UserDao.UpdatePassword(userId, rcp.NewPassword)
 	if err != nil {
 		if err == util.ErrRowsAffected {
 			return util.ErrRowsAffectedCode

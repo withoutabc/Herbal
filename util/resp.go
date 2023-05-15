@@ -45,7 +45,7 @@ func RespUnauthorizedErr(c *gin.Context) {
 }
 
 func NormErr(c *gin.Context, status int, info string) {
-	c.JSON(http.StatusBadRequest, respTemplate{
+	c.JSON(http.StatusOK, respTemplate{
 		status,
 		info,
 	})

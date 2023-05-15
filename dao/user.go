@@ -12,8 +12,13 @@ type UserDaoImpl struct {
 	gdb *gorm.DB
 }
 
+func (u *UserDaoImpl) SearchUserById(i int) (user model.User, err error) {
+	result := u.gdb.Where(&model.User{UserId: i}).First(&user)
+	return user, result.Error
+}
+
 func (u *UserDaoImpl) UpdatePassword(userId int, password string) (err error) {
-	result := u.gdb.Where(&model.User{UserId: userId}).Update("password", password)
+	result := u.gdb.Table("users").Where(&model.User{UserId: userId}).Update("password", password)
 	if result.RowsAffected != 1 {
 		return util.ErrRowsAffected
 	}

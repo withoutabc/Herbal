@@ -46,8 +46,10 @@ func (i *InfoServiceImpl) SearchInfo(c *gin.Context) {
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	case util.ErrRecordNotFoundCode:
 		util.NormErr(c, 1002, "no record")
+		return
 	}
 	util.RespNormSuccess(c, info)
 }
@@ -63,12 +65,14 @@ func (i *InfoServiceImpl) UpdateInfo(c *gin.Context) {
 	var info model.BasicInfo
 	if err = c.ShouldBind(&info); err != nil {
 		util.RespParamErr(c)
+		return
 	}
 	//service
 	code := i.InfoService.UpdateInfo(IntUserId, info)
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	}
 	util.RespOK(c, "success")
 }
@@ -84,6 +88,7 @@ func (i *InfoServiceImpl) AddBasic(c *gin.Context) {
 	var basic model.BasicData
 	if err = c.ShouldBind(&basic); err != nil {
 		util.RespParamErr(c)
+		return
 	}
 	basic.UserId = IntUserId
 	basic.Time = time.Now()
@@ -92,6 +97,7 @@ func (i *InfoServiceImpl) AddBasic(c *gin.Context) {
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	}
 	util.RespOK(c, "success")
 }
@@ -109,8 +115,10 @@ func (i *InfoServiceImpl) SearchBasic(c *gin.Context) {
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	case util.ErrRecordNotFoundCode:
 		util.NormErr(c, 1002, "no record")
+		return
 	}
 	util.RespNormSuccess(c, basics)
 }
@@ -126,6 +134,7 @@ func (i *InfoServiceImpl) AddMotor(c *gin.Context) {
 	var motor model.MotorData
 	if err = c.ShouldBind(&motor); err != nil {
 		util.RespParamErr(c)
+		return
 	}
 	motor.UserId = IntUserId
 	motor.Time = time.Now()
@@ -134,6 +143,7 @@ func (i *InfoServiceImpl) AddMotor(c *gin.Context) {
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	}
 	util.RespOK(c, "success")
 }
@@ -151,8 +161,10 @@ func (i *InfoServiceImpl) SearchMotor(c *gin.Context) {
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	case util.ErrRecordNotFoundCode:
 		util.NormErr(c, 1002, "no record")
+		return
 	}
 	util.RespNormSuccess(c, motors)
 }
@@ -170,8 +182,10 @@ func (i *InfoServiceImpl) SearchConclusion(c *gin.Context) {
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	case util.ErrRecordNotFoundCode:
 		util.NormErr(c, 1002, "no record")
+		return
 	}
 	util.RespNormSuccess(c, conclusion)
 }
@@ -187,12 +201,14 @@ func (i *InfoServiceImpl) UpdateConclusion(c *gin.Context) {
 	var conclusion model.Conclusion
 	if err = c.ShouldBind(&conclusion); err != nil {
 		util.RespParamErr(c)
+		return
 	}
 	//service
 	code := i.InfoService.UpdateConclusion(IntUserId, conclusion)
 	switch code {
 	case util.InternalServerErrCode:
 		util.RespInternalErr(c)
+		return
 	}
 	util.RespOK(c, "success")
 }
