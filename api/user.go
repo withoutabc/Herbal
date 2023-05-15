@@ -7,6 +7,7 @@ import (
 	"herbalBody/util"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type UserServiceImpl struct {
@@ -23,6 +24,7 @@ type UserService interface {
 	RegisterService(model.RegisterUser) (code int32, err error)
 	LoginService(model.LoginUser) (model.Login, int32, error)
 	RefreshTokenService(token model.RefreshToken) (model.Login, int32, error)
+	ChangePassword(userId int, newPassword string) (code int)
 }
 
 func (u *UserServiceImpl) Register(c *gin.Context) {
@@ -112,4 +114,28 @@ func (u *UserServiceImpl) Refresh(c *gin.Context) {
 		Info:   "refresh token success",
 		Data:   loginModel,
 	})
+}
+
+func (u *UserServiceImpl) ChangePassword(c *gin.Context) {
+	//receive
+	userId := c.Param("user_id")
+	IntUserId, err := strconv.Atoi(userId)
+	if err != nil {
+		util.RespParamErr(c)
+		return
+	}
+	var ReqChangePwd model.ReqChangePwd
+	if err = c.ShouldBind(&ReqChangePwd); err != nil {
+		util.RespParamErr(c)
+		return
+	}
+	//service
+	code := u.UserService.ChangePassword(IntUserId, ReqChangePwd.Password)
+	switch code {
+	case util.ErrRowsAffectedCode:
+		util.NormErr(c, 1001, "数据更新失败")
+	case util.InternalServerErrCode:
+		util.RespInternalErr(c)
+	}
+	util.RespOK(c, "success")
 }

@@ -23,6 +23,10 @@ type RefreshToken struct {
 	RefreshToken string `json:"refresh_token" form:"refresh_token" binding:"required"`
 }
 
+type ReqChangePwd struct {
+	Password string `json:"password" form:"password" binding:"required"`
+}
+
 type MyClaims struct {
 	UserId    int
 	Role      string    //角色，详见roleAuth.go

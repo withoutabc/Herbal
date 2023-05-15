@@ -15,6 +15,7 @@ func InitRouter() {
 		u.POST("/register", uai.Register)
 		u.POST("/login", uai.Login)
 		u.POST("/refresh", middleware.JWTAuthMiddleware(), uai.Refresh)
+		u.POST("/password", middleware.JWTAuthMiddleware(), uai.ChangePassword)
 	}
 
 	r.GET("/questionnaire", GetQuestionnaire)
@@ -33,17 +34,17 @@ func InitRouter() {
 	}
 	{
 		ial := NewInfoApi()
-		r.GET("/info/search/:user_id", ial.SearchInfo)
-		r.PUT("/info/update/:user_id", ial.UpdateInfo)
+		r.GET("/info/search/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.SearchInfo)
+		r.PUT("/info/update/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.UpdateInfo)
 
-		r.POST("/basic/add/:user_id", ial.AddBasic)
-		r.GET("/basic/search/:user_id", ial.SearchBasic)
+		r.POST("/basic/add/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.AddBasic)
+		r.GET("/basic/search/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.SearchBasic)
 
-		r.POST("/motor/add/:user_id", ial.AddMotor)
-		r.GET("/motor/search/:user_id", ial.SearchMotor)
+		r.POST("/motor/add/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.AddMotor)
+		r.GET("/motor/search/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.SearchMotor)
 
-		r.GET("/conclusion/search/:user_id", ial.SearchConclusion)
-		r.PUT("/conclusion/update/:user_id", ial.UpdateConclusion)
+		r.GET("/conclusion/search/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.SearchConclusion)
+		r.PUT("/conclusion/update/:user_id", middleware.JWTAuthMiddleware(), middleware.CommonAuth(), ial.UpdateConclusion)
 	}
 
 	//另外一边的接口

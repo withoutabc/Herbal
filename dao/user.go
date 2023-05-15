@@ -4,11 +4,20 @@ import (
 	"database/sql"
 	"gorm.io/gorm"
 	"herbalBody/model"
+	"herbalBody/util"
 )
 
 type UserDaoImpl struct {
 	db  *sql.DB
 	gdb *gorm.DB
+}
+
+func (u *UserDaoImpl) UpdatePassword(userId int, password string) (err error) {
+	result := u.gdb.Where(&model.User{UserId: userId}).Update("password", password)
+	if result.RowsAffected != 1 {
+		return util.ErrRowsAffected
+	}
+	return result.Error
 }
 
 func (u *UserDaoImpl) SearchUserByUsername(username string) (user model.User, err error) {
