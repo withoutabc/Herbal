@@ -57,3 +57,16 @@ func RespErr(c *gin.Context, status int, err error) {
 		err.Error(),
 	})
 }
+
+type NormSuccess struct {
+	Status int    `json:"status"`
+	Info   string `json:"info"`
+	Any    any    `json:"data"`
+}
+
+func RespNormSuccess(c *gin.Context, any2 any) {
+	c.JSON(http.StatusOK, NormSuccess{Status: 200,
+		Info: "success",
+		Any:  any2,
+	})
+}

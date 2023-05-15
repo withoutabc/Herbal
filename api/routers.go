@@ -36,8 +36,10 @@ func InitRouter() {
 		r.GET("/info/search/:user_id", ial.SearchInfo)
 		r.PUT("/info/update/:user_id", ial.UpdateInfo)
 
+		r.POST("/basic/add/:user_id", ial.AddBasic)
 		r.GET("/basic/search/:user_id", ial.SearchBasic)
 
+		r.POST("/motor/add/:user_id", ial.AddMotor)
 		r.GET("/motor/search/:user_id", ial.SearchMotor)
 
 		r.GET("/conclusion/search/:user_id", ial.SearchConclusion)

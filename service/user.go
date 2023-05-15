@@ -4,17 +4,20 @@ import (
 	"gorm.io/gorm"
 	"herbalBody/dao"
 	"herbalBody/model"
+	"herbalBody/util"
 	"log"
 	"time"
 )
 
 type UserDaoImpl struct {
+	InfoDao
 	UserDao
 	*gorm.DB
 }
 
 func NewUserServiceImpl() *UserDaoImpl {
 	return &UserDaoImpl{
+		InfoDao: dao.NewInfoDao(),
 		UserDao: dao.NewUserDao(),
 		DB:      dao.GetGDB(),
 	}
@@ -55,26 +58,32 @@ func (u *UserDaoImpl) RegisterService(registerUser model.RegisterUser) (code int
 	//transaction
 	tx := u.DB.Begin()
 	//create user
-	err = u.UserDao.InsertUser(registerUser)
-	if err != nil {
-		tx.Rollback()
-		log.Printf("insert user err:%v\n", err)
-		return 100, err
+	if ResultErrorRollback(tx, tx.Create(&model.User{
+		Username: registerUser.Username,
+		Password: registerUser.Password,
+		Role:     registerUser.Role,
+	}).Error) != 0 {
+		return util.TransactionErrorCode, util.TransactionError
+	}
+	//search user id
+	var user model.User
+	if ResultErrorRollback(tx, tx.Where(&model.User{Username: registerUser.Username}).First(&user).Error) != 0 {
+		return util.TransactionErrorCode, util.TransactionError
 	}
 	//create signature
-	userId, err := u.UserDao.SearchUserIdByUsername(registerUser.Username)
-	if err != nil {
-		log.Printf("search user id err:%v\n", err)
-		return 100, err
+	if ResultErrorRollback(tx, tx.Create(&model.Signature{UserId: user.UserId}).Error) != 0 {
+		return util.TransactionErrorCode, util.TransactionError
 	}
-	err = u.UserDao.InsertSignature(userId)
-	if err != nil {
-		tx.Rollback()
-		log.Printf("insert signature err:%v\n", err)
-		return 100, err
+	//create basic info
+	if ResultErrorRollback(tx, tx.Create(&model.BasicInfo{UserId: user.UserId}).Error) != 0 {
+		return util.TransactionErrorCode, util.TransactionError
+	}
+	//create conclusions
+	if ResultErrorRollback(tx, tx.Create(&model.Conclusion{UserId: user.UserId}).Error) != 0 {
+		return util.TransactionErrorCode, util.TransactionError
 	}
 	//correct
-	return 0, nil
+	return 0, tx.Commit().Error
 }
 
 func (u *UserDaoImpl) LoginService(user model.LoginUser) (model.Login, int32, error) {

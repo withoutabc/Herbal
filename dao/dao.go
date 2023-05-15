@@ -55,3 +55,20 @@ func ConnectGorm() {
 	GDB.AutoMigrate(&model.MotorData{})
 	GDB.AutoMigrate(&model.Conclusion{})
 }
+
+func WithTransaction(fn func(db *gorm.DB) error) error {
+	tx := GDB.Begin()
+	defer func() {
+		if err := recover(); err != nil {
+			tx.Rollback()
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	if err := fn(tx); err != nil {
+		return err
+	}
+	return nil
+}
