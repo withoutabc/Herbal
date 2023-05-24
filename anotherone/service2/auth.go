@@ -21,8 +21,11 @@ func init() {
 }
 
 const (
-	appID      = "wxd96aed10a5cbf5d8"
-	appSecret  = "ac0ee65a4f3c8ed8a25fb0f8a0a4278c"
+	//appID      = "wxd96aed10a5cbf5d8"
+	//appSecret  = "ac0ee65a4f3c8ed8a25fb0f8a0a4278c"
+
+	appID      = "wx635de6995706742d"
+	appSecret  = "4f991c3543c6fbc7833beb3023bb0aa5"
 	requestUrl = "https://api.weixin.qq.com/sns/jscode2session"
 )
 

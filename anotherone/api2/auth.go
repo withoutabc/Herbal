@@ -13,9 +13,9 @@ var log2 = mylog.Log
 // OpenIDLogin 登录接口
 func OpenIDLogin(c *gin.Context) {
 	query := struct {
-		Iv        string `query:"iv"`
-		PhoneData string `query:"phoneData"`
-		Code      string `query:"code"`
+		Iv        string `query:"iv" binding:"required"`
+		PhoneData string `query:"phoneData" binding:"required"`
+		Code      string `query:"code" binding:"required"`
 	}{}
 	if handleError(c, errutil.ToCodeError(codes.ErrGinBindingQuery, c.ShouldBindQuery(&query))) {
 		log2.Error(codes.CodeErrorMap[codes.ErrGinBindingQuery])

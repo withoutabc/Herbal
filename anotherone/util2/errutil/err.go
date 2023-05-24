@@ -11,7 +11,7 @@ func (e CodeError) Error() string {
 	return e.reason
 }
 
-func NewWithCode(code int) CodeError {
+func NewWithCode(code int) error {
 	return CodeError{
 		Code:   code,
 		reason: codes.CodeErrorMap[code],

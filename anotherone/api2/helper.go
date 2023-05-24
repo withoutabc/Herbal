@@ -27,9 +27,16 @@ func jsonMessage(c *gin.Context, err error) {
 
 }
 
-func codeAndError(c *gin.Context, err errutil.CodeError) {
+func codeAndError(c *gin.Context, err error) {
+	if e, ok := err.(errutil.CodeError); ok {
+		c.JSON(http.StatusOK, gin.H{
+			"status": e.Code,
+			"msg":    e.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"status": err.Code,
+		"status": codes.ErrUnknown,
 		"msg":    err.Error(),
 	})
 }
