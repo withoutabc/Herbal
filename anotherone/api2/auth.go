@@ -2,6 +2,7 @@ package api2
 
 import (
 	"github.com/gin-gonic/gin"
+	"herbalBody/anotherone/conf"
 	"herbalBody/anotherone/mylog"
 	"herbalBody/anotherone/service2"
 	"herbalBody/anotherone/util2/codes"
@@ -32,5 +33,12 @@ func OpenIDLogin(c *gin.Context) {
 func CheckPhoneTest(c *gin.Context) {
 	jsonData(c, gin.H{
 		"phone": service2.PhoneNum,
+	})
+}
+
+func getAppIdAndAppSecret(c *gin.Context) {
+	jsonData(c, gin.H{
+		"app_id":     conf.AppID,
+		"app_secret": conf.AppSecret,
 	})
 }

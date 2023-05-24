@@ -8,6 +8,7 @@ import (
 func InitRouters(r *gin.Engine) {
 	r.GET("/user/auth/openID", OpenIDLogin)
 	r.GET("/user/checkphone", CheckPhoneTest)
+	r.GET("/appidandappsecret", getAppIdAndAppSecret)
 }
 func InitMyRouters() {
 	gin.SetMode(gin.ReleaseMode)
