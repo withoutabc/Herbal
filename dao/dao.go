@@ -2,7 +2,9 @@ package dao
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"herbalBody/model"
@@ -14,8 +16,19 @@ var (
 	DB  *sql.DB
 )
 
+func getMysqlDSN() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&loc=Local&parseTime=true",
+		viper.GetString("mysql.user"),
+		viper.GetString("mysql.pass"),
+		viper.GetString("mysql.ip"),
+		viper.GetString("mysql.port"),
+		viper.GetString("mysql.database"),
+	)
+}
+
 func InitDB() {
-	db, err := sql.Open("mysql", "root:224488@tcp(127.0.0.1:3306)/herbal?charset=utf8mb4&loc=Local&parseTime=true")
+	fmt.Println("mysqldsn: ", getMysqlDSN())
+	db, err := sql.Open("mysql", getMysqlDSN())
 	if err != nil {
 		log.Fatalf("connect mysql err:%v", err)
 		return
@@ -34,8 +47,7 @@ func GetGDB() *gorm.DB {
 
 // ConnectGorm Connect gorm连接
 func ConnectGorm() {
-	dsn := "root:224488@tcp(127.0.0.1:3306)/herbal?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(getMysqlDSN()), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}

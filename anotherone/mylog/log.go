@@ -55,7 +55,7 @@ var Log *logrus.Logger
 
 func init() {
 	Log = NewLog()
-	Log.Info("你好")
+	Log.Info("Logrus Init")
 }
 
 func NewLog() *logrus.Logger {

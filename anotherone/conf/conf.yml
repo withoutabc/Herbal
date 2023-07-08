@@ -1,7 +1,0 @@
-port: 8080
-
-mysql:
-  dsn: "root:root@tcp(127.0.0.1:3306)/herbal?charset=utf8mb4&parseTime=True&loc=Local"
-
-log: 
-  dir: ./anotherone/log2/logs/

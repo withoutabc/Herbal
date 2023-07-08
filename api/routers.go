@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"herbalBody/anotherone/api2"
 	"herbalBody/middleware"
 )
@@ -50,5 +51,5 @@ func InitRouter() {
 	//另外一边的接口
 	api2.InitRouters(r)
 
-	r.Run(":10")
+	r.Run(":" + viper.GetString("web.port"))
 }
