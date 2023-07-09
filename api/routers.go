@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"herbalBody/anotherone/api2"
@@ -8,8 +9,8 @@ import (
 )
 
 func InitRouter() {
-	r := gin.Default()
-	r.Use(middleware.CORS())
+	r := gin.New()
+	r.Use(middleware.LogMiddleware(), gin.Recovery(), middleware.CORS())
 	u := r.Group("/user")
 	{
 		uai := NewUserApi()
@@ -51,5 +52,9 @@ func InitRouter() {
 	//另外一边的接口
 	api2.InitRouters(r)
 
-	r.Run(":" + viper.GetString("web.port"))
+	//r.Run(":" + viper.GetString("web.port"))
+	err := r.RunTLS(":"+viper.GetString("web.port"), "crt.pem", "key.pem")
+	if err != nil {
+		fmt.Println("tls err: ", err)
+	}
 }

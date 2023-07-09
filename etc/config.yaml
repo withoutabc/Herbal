@@ -5,4 +5,5 @@ mysql:
   port: 3306
   database: herbal
 web:
-  port: 10
+  port: 1010
+outputdir: log

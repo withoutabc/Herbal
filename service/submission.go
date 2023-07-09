@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 	"herbalBody/dao"
 	"herbalBody/model"
-	"log"
+	"herbalBody/mylog"
 	"math"
 	"os"
 )
@@ -78,7 +78,7 @@ func (q *SubmissionDaoImpl) IfSubmissionValid(s model.Submission) (code int, err
 	//查找最大的问题id
 	max, err := q.FindMaxQuestionId(questionnaireId)
 	if err != nil {
-		log.Printf("find max question id err:%v\n", err)
+		mylog.Log.Printf("find max question id err:%v\n", err)
 		return 100, err
 	}
 	//判断是不是大于的id没有
@@ -94,7 +94,7 @@ func (q *SubmissionDaoImpl) IfSubmissionValid(s model.Submission) (code int, err
 		if test.QuestionId == k+1 {
 			answers, err := q.FindAllAnswers(questionnaireId, test.QuestionId)
 			if err != nil {
-				log.Printf("find all answers err:%v\n", err)
+				mylog.Log.Printf("find all answers err:%v\n", err)
 				return 100, err
 			}
 
@@ -122,13 +122,13 @@ func (q *SubmissionDaoImpl) Submit(s model.Submission) (code int, err error) {
 	//判断是否存在那一行数据
 	err, b := dao.QueryIfGrade(s.UserId)
 	if err != nil {
-		log.Printf("query grade err:%v\n", err)
+		mylog.Log.Printf("query grade err:%v\n", err)
 		return 100, err
 	}
 	if b == false {
 		err = dao.InsertGrade(s.UserId)
 		if err != nil {
-			log.Printf("insert grade err:%v", err)
+			mylog.Log.Printf("insert grade err:%v", err)
 			return 100, err
 		}
 	}
@@ -139,7 +139,7 @@ func (q *SubmissionDaoImpl) Submit(s model.Submission) (code int, err error) {
 		if tx != nil {
 			_ = tx.Rollback()
 		}
-		log.Printf("begin trans action failed! err:%v", err)
+		mylog.Log.Printf("begin trans action failed! err:%v", err)
 		return 100, err
 	}
 	sql1 := "insert into submission (user_id, step, question_id, answer_id) values (?,?,?,?)"
@@ -147,12 +147,12 @@ func (q *SubmissionDaoImpl) Submit(s model.Submission) (code int, err error) {
 	//预处理
 	stmt1, err := tx.Prepare(sql1)
 	if err != nil {
-		log.Printf("prepare err:%v\n", err)
+		mylog.Log.Printf("prepare err:%v\n", err)
 		return 100, err
 	}
 	stmt2, err := tx.Prepare(sql2)
 	if err != nil {
-		log.Printf("prepare err:%v\n", err)
+		mylog.Log.Printf("prepare err:%v\n", err)
 		return
 	}
 	//for循环添加每一条答案
@@ -160,20 +160,20 @@ func (q *SubmissionDaoImpl) Submit(s model.Submission) (code int, err error) {
 		//判断用户的这个答案是否已经填写，如果已经填写则进行修改
 		err, b := dao.QueryIfExistQuestion(s, s.Data[i].QuestionId)
 		if err != nil {
-			log.Printf("query err:%v\n", err)
+			mylog.Log.Printf("query err:%v\n", err)
 			return 100, err
 		}
 		if b == true {
 			result, err := stmt2.Exec(s.Data[i].AnswerId, s.Data[i].QuestionId, s.UserId, s.Step)
 			if err != nil {
 				_ = tx.Rollback()
-				log.Printf("exec failed err:%v\n", err)
+				mylog.Log.Printf("exec failed err:%v\n", err)
 				return 100, err
 			}
 			_, err = result.RowsAffected()
 			if err != nil {
 				_ = tx.Rollback()
-				log.Printf("exec rowsAffected err:%v\n", err)
+				mylog.Log.Printf("exec rowsAffected err:%v\n", err)
 				return 100, err
 			}
 			continue //重开
@@ -182,18 +182,18 @@ func (q *SubmissionDaoImpl) Submit(s model.Submission) (code int, err error) {
 		result, err := stmt1.Exec(s.UserId, s.Step, s.Data[i].QuestionId, s.Data[i].AnswerId)
 		if err != nil {
 			_ = tx.Rollback()
-			log.Printf("exec failed err:%v\n", err)
+			mylog.Log.Printf("exec failed err:%v\n", err)
 			return 100, err
 		}
 		n, err := result.RowsAffected()
 		if err != nil {
 			_ = tx.Rollback()
-			log.Printf("exec rowsAffected err:%v\n", err)
+			mylog.Log.Printf("exec rowsAffected err:%v\n", err)
 			return 100, err
 		}
 		if n != 1 {
 			_ = tx.Rollback()
-			log.Printf("transaction commit error, rollback\n")
+			mylog.Log.Printf("transaction commit error, rollback\n")
 			return 100, errors.New("事务提交错误")
 		}
 	}
@@ -223,11 +223,11 @@ func (q *SubmissionDaoImpl) Submit(s model.Submission) (code int, err error) {
 	err = dao.UpdateChangeGrade(s.UserId, map1[s.Step], int(math.Round(changeGrade)))
 	if err != nil {
 		_ = tx.Rollback()
-		log.Printf("update grade err:%v\n", err)
+		mylog.Log.Printf("update grade err:%v\n", err)
 		return 100, err
 	}
 	_ = tx.Commit()
-	log.Println("transaction success")
+	mylog.Log.Println("transaction success")
 	return 0, nil
 }
 
@@ -240,7 +240,7 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 	for i := 0; i < 9; i++ {
 		grade, err := q.QueryGrade(userId, i+1)
 		if err != nil {
-			log.Printf("query grade err:%v\n", err)
+			mylog.Log.Printf("query grade err:%v\n", err)
 			return model.Comment{}, 100, err
 		}
 		grades = append(grades, grade)
@@ -253,7 +253,7 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 				comment.Result = append(comment.Result, map3[i+1])
 				suggestion, err := q.QuestionDao.QuerySuggestion(i + 1)
 				if err != nil {
-					log.Printf("query suggestion err:%v\n", err)
+					mylog.Log.Printf("query suggestion err:%v\n", err)
 					return model.Comment{}, 100, err
 				}
 				comment.Suggestion = append(comment.Suggestion, suggestion)
@@ -269,7 +269,7 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 		comment.Result = append(comment.Result, map3[9])
 		suggestion, err := q.QuestionDao.QuerySuggestion(9)
 		if err != nil {
-			log.Printf("query suggestion err:%v\n", err)
+			mylog.Log.Printf("query suggestion err:%v\n", err)
 			return model.Comment{}, 0, err
 		}
 		comment.Suggestion = append(comment.Suggestion, suggestion)
@@ -278,7 +278,7 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 				comment.Result = append(comment.Result, map3[i+1])
 				suggestion, err = q.QuestionDao.QuerySuggestion(i + 1)
 				if err != nil {
-					log.Printf("query suggestion err:%v\n", err)
+					mylog.Log.Printf("query suggestion err:%v\n", err)
 					return model.Comment{}, 100, err
 				}
 				comment.Suggestion = append(comment.Suggestion, suggestion)
@@ -297,11 +297,11 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 				comment.Result = append(comment.Result, map3[i])
 				suggestion, err := q.QuerySuggestion(i + 1)
 				if err != nil {
-					log.Printf("query suggestion err:%v\n", err)
+					mylog.Log.Printf("query suggestion err:%v\n", err)
 					return model.Comment{}, 100, err
 				}
 				comment.Suggestion = append(comment.Suggestion, suggestion)
-				log.Println(i)
+				mylog.Log.Println(i)
 				exist = true
 			}
 		}
@@ -315,7 +315,7 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 				comment.Result = append(comment.Result, map3[i+1])
 				suggestion, err := q.QuerySuggestion(i + 1)
 				if err != nil {
-					log.Printf("query suggestion err:%v\n", err)
+					mylog.Log.Printf("query suggestion err:%v\n", err)
 					return model.Comment{}, 100, err
 				}
 				comment.Suggestion = append(comment.Suggestion, suggestion)
@@ -330,7 +330,7 @@ func (q *SubmissionDaoImpl) Comment(userId int) (comment model.Comment, code int
 		comment.Result = append(comment.Result, map3[9])
 		suggestion, err := q.QuerySuggestion(9)
 		if err != nil {
-			log.Printf("query suggestion err:%v\n", err)
+			mylog.Log.Printf("query suggestion err:%v\n", err)
 			return model.Comment{}, 100, err
 		}
 		comment.Suggestion = append(comment.Suggestion, suggestion)
@@ -348,7 +348,7 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 	// 获取当前工作目录
 	wd, err := os.Getwd()
 	if err != nil {
-		log.Printf("os.getwd err:%v\n", err)
+		mylog.Log.Printf("os.getwd err:%v\n", err)
 		return "", 100, err
 	}
 	// 创建一个新的 Excel 文件
@@ -356,7 +356,7 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 	// 创建一个名为 Sheet1 的表格
 	index, err := f.NewSheet("Sheet1")
 	if err != nil {
-		log.Printf("new sheet err:%v\n", err)
+		mylog.Log.Printf("new sheet err:%v\n", err)
 		return "", 100, err
 	}
 	// 设置默认工作薄
@@ -364,14 +364,14 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 	// 修改工作薄名称
 	err = f.SetSheetName("Sheet1", "选项与得分")
 	if err != nil {
-		log.Printf("set sheet name err:%v\n", err)
+		mylog.Log.Printf("set sheet name err:%v\n", err)
 		return "", 100, err
 	}
 	// 写入
 	for questionnaireId := 1; ; questionnaireId++ {
 		questionnaire, err := dao.QueryQuestionnaire(questionnaireId)
 		if err != nil && err != sql.ErrNoRows {
-			log.Printf("query questionnaire err:%v\n", err)
+			mylog.Log.Printf("query questionnaire err:%v\n", err)
 			return "", 100, err
 		}
 		if questionnaire != "" {
@@ -379,18 +379,18 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 			cell = fmt.Sprintf("A%d", 2*questionnaireId-1)
 			err = f.SetCellValue("选项与得分", cell, questionnaire)
 			if err != nil {
-				log.Printf("set cell value err:%v\n", err)
+				mylog.Log.Printf("set cell value err:%v\n", err)
 				return "", 100, err
 			}
 			cell = fmt.Sprintf("A%d", 2*questionnaireId)
 			err = f.SetCellValue("选项与得分", cell, "选项")
 			if err != nil {
-				log.Printf("set cell value err:%v\n", err)
+				mylog.Log.Printf("set cell value err:%v\n", err)
 				return "", 100, err
 			}
 			questions, err := dao.QueryQuestion(questionnaireId)
 			if err != nil && err != sql.ErrNoRows {
-				log.Printf("query question err:%v\n", err)
+				mylog.Log.Printf("query question err:%v\n", err)
 				return "", 100, err
 			}
 			for k, question := range questions {
@@ -398,7 +398,7 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 				cell = fmt.Sprintf("%c%d", 'A'+k+1, 2*questionnaireId-1)
 				err = f.SetCellValue("选项与得分", cell, question.Question)
 				if err != nil {
-					log.Printf("set cell value err:%v\n", err)
+					mylog.Log.Printf("set cell value err:%v\n", err)
 					return "", 100, err
 				}
 				// 写答案
@@ -407,12 +407,12 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 				answer, err := dao.QuerySubmitAnswer(userId, questionnaireId, question.QuestionId)
 				if answer == "" {
 					if questionnaireId != 5 || (questionnaireId == 5 && question.QuestionId != 6 && question.QuestionId != 7) {
-						log.Println("用户答案未提交完全")
+						mylog.Log.Println("用户答案未提交完全")
 						return "", 101, errors.New("用户答案未提交完全")
 					}
 				}
 				if err != nil && err != sql.ErrNoRows {
-					log.Printf("query submit answer err:%v\n", err)
+					mylog.Log.Printf("query submit answer err:%v\n", err)
 					return "", 100, err
 				}
 				// 写
@@ -422,7 +422,7 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 				if answer != "" {
 					err = f.SetCellValue("选项与得分", cell, answer)
 					if err != nil {
-						log.Printf("set cell value err:%v\n", err)
+						mylog.Log.Printf("set cell value err:%v\n", err)
 						return "", 100, err
 					}
 				}
@@ -433,19 +433,19 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 			cell = fmt.Sprintf("%c%d", record+1, record2)
 			err = f.SetCellValue("选项与得分", cell, "得分")
 			if err != nil {
-				log.Printf("set cell value err:%v\n", err)
+				mylog.Log.Printf("set cell value err:%v\n", err)
 				return "", 100, err
 			}
 			cell = fmt.Sprintf("%c%d", record+1, record2+1)
 			//找一下得分
 			grade, err := q.GradeDao.QueryGrade(userId, questionnaireId)
 			if err != nil {
-				log.Printf("query err:%v\n", err)
+				mylog.Log.Printf("query err:%v\n", err)
 				return "", 100, err
 			}
 			err = f.SetCellValue("选项与得分", cell, grade)
 			if err != nil {
-				log.Printf("set cell value err:%v\n", err)
+				mylog.Log.Printf("set cell value err:%v\n", err)
 				return "", 100, err
 			}
 		} else {
@@ -458,12 +458,12 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 			Horizontal: "center",
 			Vertical:   "center"}})
 	if err != nil {
-		log.Printf("center style err:%v\n", err)
+		mylog.Log.Printf("center style err:%v\n", err)
 		return "", 100, err
 	}
 	err = f.SetCellStyle("选项与得分", "A1", cell, centerStyle)
 	if err != nil {
-		log.Printf("set cell style err:%v\n", err)
+		mylog.Log.Printf("set cell style err:%v\n", err)
 		return "", 100, err
 	}
 	//row := []interface{}{"1", nil, 2}
@@ -472,18 +472,18 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 	endCol := fmt.Sprintf("%c", record+1)
 	err = f.SetColWidth("选项与得分", "A", "A", 10)
 	if err != nil {
-		log.Printf("set col1 err:%v\n", err)
+		mylog.Log.Printf("set col1 err:%v\n", err)
 		return "", 100, err
 	}
 	err = f.SetColWidth("选项与得分", "B", endCol, 45)
 	if err != nil {
-		log.Printf("set col width err:%v\n", err)
+		mylog.Log.Printf("set col width err:%v\n", err)
 		return "", 100, err
 	}
 	for i := 1; i <= record2+1; i++ {
 		err := f.SetRowHeight("选项与得分", i, 20)
 		if err != nil {
-			log.Printf("set row height err:%v\n", err)
+			mylog.Log.Printf("set row height err:%v\n", err)
 			return "", 100, err
 		}
 	}
@@ -491,12 +491,12 @@ func (q *SubmissionDaoImpl) GenExcel(userId int) (filename string, code int, err
 	// 拼一下名字
 	err, username := dao.SearchUsernameByUserId(userId)
 	if err != nil {
-		log.Printf("search username err:%v\n", err)
+		mylog.Log.Printf("search username err:%v\n", err)
 		return "", 100, err
 	}
 	filename = fmt.Sprintf("/%s-中医智慧诊疗诊断表.xlsx", username)
 	if err := f.SaveAs(wd + "/excel" + filename); err != nil {
-		log.Printf("save file err:%v\n", err)
+		mylog.Log.Printf("save file err:%v\n", err)
 		return "", 100, err
 	}
 	return filename, 0, nil

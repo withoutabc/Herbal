@@ -3,9 +3,9 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"herbalBody/model"
+	"herbalBody/mylog"
 	"herbalBody/service"
 	"herbalBody/util"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -32,13 +32,13 @@ func (u *UserServiceImpl) Register(c *gin.Context) {
 	var registerUser model.RegisterUser
 	err := c.ShouldBind(&registerUser)
 	if err != nil {
-		log.Printf("shouldbind err:%v\n", err)
+		mylog.Log.Printf("shouldbind err:%v\n", err)
 		util.RespParamErr(c)
 		return
 	}
 	code, err := u.UserService.RegisterService(registerUser)
 	if err != nil {
-		log.Printf("register err:%v\n", err)
+		mylog.Log.Printf("register err:%v\n", err)
 		util.RespInternalErr(c)
 		return
 	}
@@ -65,13 +65,13 @@ func (u *UserServiceImpl) Login(c *gin.Context) {
 	err := c.ShouldBind(&LoginUser)
 	if err != nil {
 		util.RespParamErr(c)
-		log.Printf("shouldbind err:%v\n", err)
+		mylog.Log.Printf("shouldbind err:%v\n", err)
 		return
 	}
 	loginModel, code, err := u.LoginService(LoginUser)
 	if err != nil {
 		util.RespInternalErr(c)
-		log.Printf("internal err:%v\n", err)
+		mylog.Log.Printf("internal err:%v\n", err)
 		return
 	}
 	switch code {
@@ -97,7 +97,7 @@ func (u *UserServiceImpl) Refresh(c *gin.Context) {
 	err := c.ShouldBind(&rt)
 	if err != nil {
 		util.RespParamErr(c)
-		log.Printf("should bind err:%v\n", err)
+		mylog.Log.Printf("should bind err:%v\n", err)
 		return
 	}
 	loginModel, code, err := u.RefreshTokenService(rt)

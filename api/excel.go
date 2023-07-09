@@ -4,10 +4,10 @@ import (
 	"archive/zip"
 	"bytes"
 	"github.com/gin-gonic/gin"
+	"herbalBody/mylog"
 	"herbalBody/service"
 	"herbalBody/util"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,18 +34,18 @@ func (e *ExcelServiceImpl) GenExcel(c *gin.Context) {
 	ID, err := strconv.Atoi(userId)
 	if err != nil {
 		util.RespInternalErr(c)
-		log.Printf("strconv atoi err:%v\n", err)
+		mylog.Log.Printf("strconv atoi err:%v\n", err)
 		return
 	}
 	_, _, err = e.ExcelService.GenExcel(ID)
 	if err != nil {
 		if err.Error() == "用户答案未提交完全" {
-			log.Printf("gen excel err:%v", err.Error())
+			mylog.Log.Printf("gen excel err:%v", err.Error())
 			util.NormErr(c, 447, "用户答案未提交完全")
 			return
 		}
 		util.RespInternalErr(c)
-		log.Printf("gen excel err:%v\n", err)
+		mylog.Log.Printf("gen excel err:%v\n", err)
 		return
 	}
 	util.RespOK(c, "gen excel success")
@@ -66,7 +66,7 @@ func GetExcelZips(c *gin.Context) {
 	// 创建最外层的zip文件
 	outerZipFile, err := os.Create("excels.zip")
 	if err != nil {
-		log.Printf("os create err:%v", err)
+		mylog.Log.Printf("os create err:%v", err)
 		util.RespInternalErr(c)
 		return
 	}
@@ -183,7 +183,7 @@ func GetExcelZips(c *gin.Context) {
 		util.RespInternalErr(c)
 		return
 	}
-	log.Println(len(outerZipData))
+	mylog.Log.Println(len(outerZipData))
 	c.Header("Content-Type", "application/binary")
 	c.Header("Content-Disposition", "attachment;filename=excels.zip")
 	c.Data(http.StatusOK, "application/binary", outerZipData)

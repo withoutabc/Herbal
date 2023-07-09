@@ -3,9 +3,9 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"herbalBody/model"
+	"herbalBody/mylog"
 	"herbalBody/service"
 	"herbalBody/util"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,13 +34,13 @@ func (q *SubmissionServiceImpl) ReceiveSubmission(c *gin.Context) {
 	err := c.ShouldBind(&s)
 	if err != nil {
 		util.RespParamErr(c)
-		log.Printf("shouldbind err:%v\n", err)
+		mylog.Log.Printf("shouldbind err:%v\n", err)
 		return
 	}
 	//判断所有数据的合法性
 	code, err := q.SubmissionService.IfSubmissionValid(s)
 	if err != nil {
-		log.Printf("question service err:%v\n", err)
+		mylog.Log.Printf("question service err:%v\n", err)
 		return
 	}
 	switch code {
@@ -64,7 +64,7 @@ func (q *SubmissionServiceImpl) ReceiveSubmission(c *gin.Context) {
 			util.RespErr(c, 451, err)
 			return
 		}
-		log.Printf("submit err:%v\n", err)
+		mylog.Log.Printf("submit err:%v\n", err)
 		util.RespInternalErr(c)
 		return
 	}
@@ -79,14 +79,14 @@ func (q *SubmissionServiceImpl) GetComment(c *gin.Context) {
 	}
 	UserID, err := strconv.Atoi(userId)
 	if err != nil {
-		log.Printf("strconv atoi err:%v\n", err)
+		mylog.Log.Printf("strconv atoi err:%v\n", err)
 		util.NormErr(c, 449, "invalid user id")
 		return
 	}
 	comment, _, err := q.Comment(UserID)
 	if err != nil {
 		util.RespInternalErr(c)
-		log.Printf("get comment err:%v\n", err)
+		mylog.Log.Printf("get comment err:%v\n", err)
 		return
 	}
 	c.JSON(http.StatusOK, model.RespComment{
@@ -104,7 +104,7 @@ func Upload(c *gin.Context) {
 	}
 	UserID, err := strconv.Atoi(userId)
 	if err != nil {
-		log.Printf("strconv atoi err:%v\n", err)
+		mylog.Log.Printf("strconv atoi err:%v\n", err)
 		util.NormErr(c, 449, "invalid user id")
 		return
 	}
@@ -124,7 +124,7 @@ func Upload(c *gin.Context) {
 	}
 	wd, err := os.Getwd()
 	if err != nil {
-		log.Printf("os.getwd err:%v\n", err)
+		mylog.Log.Printf("os.getwd err:%v\n", err)
 		util.RespInternalErr(c)
 		return
 	}

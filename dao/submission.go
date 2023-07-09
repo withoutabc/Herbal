@@ -5,7 +5,7 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"herbalBody/model"
-	"log"
+	"herbalBody/mylog"
 	"sort"
 	"strings"
 )
@@ -43,7 +43,7 @@ func QueryIfExistQuestion(s model.Submission, questionId int) (err error, b bool
 	var answer string
 	err = DB.QueryRow("select answer_id from submission where user_id=? and step=? and question_id=?", s.UserId, s.Step, questionId).Scan(&answer)
 	if err != nil && err != sql.ErrNoRows {
-		log.Println("")
+		mylog.Log.Println("")
 		return err, false
 	}
 	//没找到这行==>insert处理

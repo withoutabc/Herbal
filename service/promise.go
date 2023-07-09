@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 	"herbalBody/dao"
 	"herbalBody/model"
-	"log"
+	"herbalBody/mylog"
 )
 
 type PromiseServiceImpl struct {
@@ -18,10 +18,10 @@ func (p *PromiseServiceImpl) QueryPromiseService(userId, versionId int) (model.P
 	version, err := p.QueryVersion(versionId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Println("record not found")
+			mylog.Log.Println("record not found")
 			return model.Promises{}, 101, err //version不存在
 		}
-		log.Printf("query version err:%v\n", err)
+		mylog.Log.Printf("query version err:%v\n", err)
 		return model.Promises{}, 100, err
 	}
 	promises.Version = version
@@ -29,10 +29,10 @@ func (p *PromiseServiceImpl) QueryPromiseService(userId, versionId int) (model.P
 	b, err := p.PromiseService.QueryIfSubmit(userId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Println("record not found")
+			mylog.Log.Println("record not found")
 			return model.Promises{}, 102, err //用户未注册
 		}
-		log.Printf("query if submit err:%v\n", err)
+		mylog.Log.Printf("query if submit err:%v\n", err)
 		return model.Promises{}, 100, err
 	}
 	promises.IsSubmit = b
@@ -59,7 +59,7 @@ func (p *PromiseServiceImpl) QueryPromiseService(userId, versionId int) (model.P
 	//change false into true
 	err = p.SignatureService.ChangeSignatureStatus(userId)
 	if err != nil {
-		log.Printf("change signature status err:%v\n", err)
+		mylog.Log.Printf("change signature status err:%v\n", err)
 		return model.Promises{}, 100, err
 	}
 	return promises, 0, nil

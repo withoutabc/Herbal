@@ -8,7 +8,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"herbalBody/model"
-	"log"
+	"herbalBody/mylog"
 )
 
 var (
@@ -27,14 +27,18 @@ func getMysqlDSN() string {
 }
 
 func InitDB() {
-	fmt.Println("mysqldsn: ", getMysqlDSN())
+
+	mylog.Log.Info("mysql initializing...")
 	db, err := sql.Open("mysql", getMysqlDSN())
 	if err != nil {
-		log.Fatalf("connect mysql err:%v", err)
+		mylog.Log.Errorf("connect mysql err:%v", err)
 		return
 	}
 	DB = db
-	log.Println(db.Ping())
+	if err = db.Ping(); err != nil {
+		mylog.Log.Error("mysql fails to initialize")
+	}
+
 }
 
 func GetDB() *sql.DB {
@@ -52,7 +56,7 @@ func ConnectGorm() {
 		panic("failed to connect database")
 	}
 	GDB = db
-	log.Println("连接成功")
+	mylog.Log.Println("连接成功")
 	GDB.AutoMigrate(&model.Questions{})
 	GDB.AutoMigrate(&model.Option{})
 	GDB.AutoMigrate(&model.User{})

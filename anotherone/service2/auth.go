@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"herbalBody/anotherone/conf"
-	"herbalBody/anotherone/mylog"
 	"herbalBody/anotherone/util2"
 	"herbalBody/anotherone/util2/codes"
 	"herbalBody/anotherone/util2/errutil"
 	"herbalBody/anotherone/util2/requester"
+	"herbalBody/mylog"
 )
 
 var log2 = mylog.Log

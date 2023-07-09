@@ -4,8 +4,8 @@ import (
 	"gorm.io/gorm"
 	"herbalBody/dao"
 	"herbalBody/model"
+	"herbalBody/mylog"
 	"herbalBody/util"
-	"log"
 	"time"
 )
 
@@ -50,7 +50,7 @@ func (u *UserDaoImpl) RegisterService(registerUser model.RegisterUser) (code int
 	//手机号是否重复
 	mysqlUser, err := u.UserDao.SearchUserByUsername(registerUser.Username)
 	if err != nil && err != gorm.ErrRecordNotFound {
-		log.Printf("search user err:%v\n", err)
+		mylog.Log.Printf("search user err:%v\n", err)
 		return 100, err
 	}
 	if mysqlUser.Password != "" {
@@ -96,7 +96,7 @@ func (u *UserDaoImpl) LoginService(user model.LoginUser) (model.Login, int32, er
 			// 101 用户名不存在
 			return model.Login{}, 101, nil
 		} else {
-			log.Printf("search password err:%v\n", err)
+			mylog.Log.Printf("search password err:%v\n", err)
 			return model.Login{}, 100, nil
 		}
 	}
@@ -108,7 +108,7 @@ func (u *UserDaoImpl) LoginService(user model.LoginUser) (model.Login, int32, er
 	//成功登录，设置token
 	accessToken, refreshToken, claims, err := GenToken(mysqlUser.UserId, mysqlUser.Role)
 	if err != nil {
-		log.Printf("gen token err:%v\n", err)
+		mylog.Log.Printf("gen token err:%v\n", err)
 		return model.Login{}, 100, nil
 	}
 	return model.Login{
@@ -131,7 +131,7 @@ func (u *UserDaoImpl) RefreshTokenService(token model.RefreshToken) (model.Login
 			//102签名认证错误
 			return model.Login{}, 102, nil
 		}
-		log.Printf("refresh token err:%v\n", err)
+		mylog.Log.Printf("refresh token err:%v\n", err)
 		return model.Login{}, 100, nil
 	}
 	return model.Login{

@@ -2,11 +2,11 @@ package service
 
 import (
 	"gorm.io/gorm"
-	"log"
+	"herbalBody/mylog"
 )
 
 func ResultErrorRollback(tx *gorm.DB, err error) int {
-	log.Printf("%v", err)
+	mylog.Log.Printf("%v", err)
 
 	if err != nil {
 		tx.Rollback()

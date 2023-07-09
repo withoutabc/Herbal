@@ -2,7 +2,7 @@ package dao2
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	log2 "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -18,10 +18,10 @@ func ConnectGorm2() {
 	dsn := viper.GetString("mysql.dsn")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log2.Error("gorm: failed to connect database")
+		log.Error("gorm: failed to connect database")
 	}
 	GDB = db
-	log2.Info("gorm init success")
+	log.Info("gorm init success")
 	GDB.AutoMigrate(&model.Questions{})
 	GDB.AutoMigrate(&model.Option{})
 	GDB.AutoMigrate(&model.User{})

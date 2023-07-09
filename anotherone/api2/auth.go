@@ -3,10 +3,10 @@ package api2
 import (
 	"github.com/gin-gonic/gin"
 	"herbalBody/anotherone/conf"
-	"herbalBody/anotherone/mylog"
 	"herbalBody/anotherone/service2"
 	"herbalBody/anotherone/util2/codes"
 	"herbalBody/anotherone/util2/errutil"
+	"herbalBody/mylog"
 )
 
 var log2 = mylog.Log
