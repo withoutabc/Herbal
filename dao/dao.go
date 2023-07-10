@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -9,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"herbalBody/model"
 	"herbalBody/mylog"
+	"time"
 )
 
 var (
@@ -27,17 +29,33 @@ func getMysqlDSN() string {
 }
 
 func InitDB() {
-
-	mylog.Log.Info("mysql initializing...")
-	db, err := sql.Open("mysql", getMysqlDSN())
-	if err != nil {
-		mylog.Log.Errorf("connect mysql err:%v", err)
-		return
+	mylog.Log.Infof("sql: mysql dsn=%s", getMysqlDSN())
+	mylog.Log.Info("sql: mysql initializing...")
+	var db *sql.DB
+	var err error
+	success := make(chan struct{}, 1)
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancelFunc()
+	go func() {
+		for {
+			db, err = sql.Open("mysql", getMysqlDSN())
+			if err != nil || db.Ping() != nil {
+				mylog.Log.Error("sql: mysql initialized failed,try again...")
+				time.Sleep(2 * time.Second)
+				continue
+			} else {
+				success <- struct{}{}
+				mylog.Log.Println("sql: mysql initializes successfully")
+				return
+			}
+		}
+	}()
+	select {
+	case <-timeout.Done():
+		panic("sql: mysql initialized timeout!")
+	case <-success:
 	}
 	DB = db
-	if err = db.Ping(); err != nil {
-		mylog.Log.Error("mysql fails to initialize")
-	}
 
 }
 
@@ -51,12 +69,32 @@ func GetGDB() *gorm.DB {
 
 // ConnectGorm Connect gorm连接
 func ConnectGorm() {
-	db, err := gorm.Open(mysql.Open(getMysqlDSN()), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
+	var db *gorm.DB
+	var err error
+	success := make(chan struct{}, 1)
+	timeout, cancelFunc := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancelFunc()
+	go func() {
+		for {
+			db, err = gorm.Open(mysql.Open(getMysqlDSN()), &gorm.Config{})
+			if err != nil {
+				mylog.Log.Error("gorm: mysql initialized failed,try again...")
+				time.Sleep(2 * time.Second)
+				continue
+			} else {
+				success <- struct{}{}
+				mylog.Log.Println("gorm: mysql initializes successfully")
+				return
+			}
+		}
+	}()
+	select {
+	case <-timeout.Done():
+		panic("gorm: mysql initialized timeout!")
+	case <-success:
 	}
+
 	GDB = db
-	mylog.Log.Println("连接成功")
 	GDB.AutoMigrate(&model.Questions{})
 	GDB.AutoMigrate(&model.Option{})
 	GDB.AutoMigrate(&model.User{})
